@@ -8,51 +8,55 @@ import { Calculator, Home, DollarSign, TrendingUp, Users, Banknote, AlertTriangl
 import './App.css'
 
 function App() {
-  const [housePrice, setHousePrice] = useState(12500000)
-  const [borisCash, setBorisCash] = useState(500000)
-  const [christineCash, setChristineCash] = useState(700000)
-  const [flatSalePrice, setFlatSalePrice] = useState(3000000)
-  const [totalExistingMortgage, setTotalExistingMortgage] = useState(1500000)
-  const [borisExistingMortgage, setBorisExistingMortgage] = useState(900000)
-  const [christineExistingMortgage, setChristineExistingMortgage] = useState(600000)
-  const [borisFlatShare, setBorisFlatShare] = useState(60)
-  const [christineFlatShare, setChristineFlatShare] = useState(40)
-  const [borisContribution, setBorisContribution] = useState(0)
-  const [christineContribution, setChristineContribution] = useState(0)
-  const [borisHouseShare, setBorisHouseShare] = useState(50)
-  const [christineHouseShare, setChristineHouseShare] = useState(50)
-  const [grantedLoan, setGrantedLoan] = useState(8256000)
+  const [housePrice, setHousePrice] = useState(1000000)
+  const [personAName, setPersonAName] = useState('Person A')
+  const [personBName, setPersonBName] = useState('Person B')
+  const [personAColor, setPersonAColor] = useState('#2563eb') // default blue-600
+  const [personBColor, setPersonBColor] = useState('#db2777') // default pink-600
+  const [personACash, setPersonACash] = useState(1000000)
+  const [personBCash, setPersonBCash] = useState(1000000)
+  const [flatSalePrice, setFlatSalePrice] = useState(0)
+  const [totalExistingMortgage, setTotalExistingMortgage] = useState(0)
+  const [personAExistingMortgage, setPersonAExistingMortgage] = useState(0)
+  const [personBExistingMortgage, setPersonBExistingMortgage] = useState(0)
+  const [personAFlatShare, setPersonAFlatShare] = useState(50)
+  const [personBFlatShare, setPersonBFlatShare] = useState(50)
+  const [personAContribution, setPersonAContribution] = useState(0)
+  const [personBContribution, setPersonBContribution] = useState(0)
+  const [personAHouseShare, setPersonAHouseShare] = useState(50)
+  const [personBHouseShare, setPersonBHouseShare] = useState(50)
+  const [grantedLoan, setGrantedLoan] = useState(5000000)
   const [interestRate, setInterestRate] = useState(5.13)
   const [loanTerm, setLoanTerm] = useState(30)
-  const [hasRentalUnit, setHasRentalUnit] = useState(true)
-  const [rentalIncome, setRentalIncome] = useState(15000)
+  const [hasRentalUnit, setHasRentalUnit] = useState(false)
+  const [rentalIncome, setRentalIncome] = useState(0)
 
   const [calculations, setCalculations] = useState({
-    borisGrossShare: 0,
-    christineGrossShare: 0,
-    borisNetProceeds: 0,
-    christineNetProceeds: 0,
+    personAGrossShare: 0,
+    personBGrossShare: 0,
+    personANetProceeds: 0,
+    personBNetProceeds: 0,
     totalNetProceeds: 0,
-    borisMaxContribution: 0,
-    christineMaxContribution: 0,
+    personAMaxContribution: 0,
+    personBMaxContribution: 0,
     totalContribution: 0,
-    borisHouseValue: 0,
-    christineHouseValue: 0,
-    borisLoanNeed: 0,
-    christineLoanNeed: 0,
+    personAHouseValue: 0,
+    personBHouseValue: 0,
+    personALoanNeed: 0,
+    personBLoanNeed: 0,
     totalLoanNeeded: 0,
-    borisMonthlyPayment: 0,
-    christineMonthlyPayment: 0,
-    borisRentalShare: 0,
-    christineRentalShare: 0,
-    borisFinalPayment: 0,
-    christineFinalPayment: 0,
+    personAMonthlyPayment: 0,
+    personBMonthlyPayment: 0,
+    personARentalShare: 0,
+    personBRentalShare: 0,
+    personAFinalPayment: 0,
+    personBFinalPayment: 0,
     totalMonthlyPayment: 0,
-    borisAvailableCash: 0,
-    christineAvailableCash: 0,
+    personAAvailableCash: 0,
+    personBAvailableCash: 0,
     totalAvailableCash: 0,
-    borisFirstInterest: 0,
-    christineFirstInterest: 0,
+    personAFirstInterest: 0,
+    personBFirstInterest: 0,
     mortgageValidation: 0,
     houseShareValidation: 0
   })
@@ -70,112 +74,124 @@ function App() {
     return pv * rate
   }
 
+  const hexToRgba = (hex, alpha = 1) => {
+    if (!hex) return `rgba(0,0,0,${alpha})`
+    const normalized = hex.replace('#', '')
+    const bigint = parseInt(normalized.length === 3
+      ? normalized.split('').map((c) => c + c).join('')
+      : normalized, 16)
+    const r = (bigint >> 16) & 255
+    const g = (bigint >> 8) & 255
+    const b = bigint & 255
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`
+  }
+
   useEffect(() => {
     // Normalize flat share percentages
-    const totalFlatShare = borisFlatShare + christineFlatShare
-    const normalizedBorisShare = totalFlatShare > 0 ? borisFlatShare / totalFlatShare : 0.5
-    const normalizedChristineShare = totalFlatShare > 0 ? christineFlatShare / totalFlatShare : 0.5
+    const totalFlatShare = personAFlatShare + personBFlatShare
+    const normalizedPersonAShare = totalFlatShare > 0 ? personAFlatShare / totalFlatShare : 0.5
+    const normalizedPersonBShare = totalFlatShare > 0 ? personBFlatShare / totalFlatShare : 0.5
 
     // Calculate gross shares of flat sale
-    const borisGrossShare = flatSalePrice * normalizedBorisShare
-    const christineGrossShare = flatSalePrice * normalizedChristineShare
+    const personAGrossShare = flatSalePrice * normalizedPersonAShare
+    const personBGrossShare = flatSalePrice * normalizedPersonBShare
     
     // Calculate net proceeds after paying individual mortgage shares
-    const borisNetProceeds = borisGrossShare - borisExistingMortgage
-    const christineNetProceeds = christineGrossShare - christineExistingMortgage
-    const totalNetProceeds = borisNetProceeds + christineNetProceeds
+    const personANetProceeds = personAGrossShare - personAExistingMortgage
+    const personBNetProceeds = personBGrossShare - personBExistingMortgage
+    const totalNetProceeds = personANetProceeds + personBNetProceeds
     
     // Calculate maximum possible contributions (cash + net flat proceeds)
-    const borisMaxContribution = borisCash + borisNetProceeds
-    const christineMaxContribution = christineCash + christineNetProceeds
+    const personAMaxContribution = personACash + personANetProceeds
+    const personBMaxContribution = personBCash + personBNetProceeds
     
     // Set default contributions if not manually set
-    const actualBorisContribution = borisContribution || borisMaxContribution
-    const actualChristineContribution = christineContribution || christineMaxContribution
+    const actualPersonAContribution = personAContribution || personAMaxContribution
+    const actualPersonBContribution = personBContribution || personBMaxContribution
     
-    const totalContribution = actualBorisContribution + actualChristineContribution
+    const totalContribution = actualPersonAContribution + actualPersonBContribution
     
     // Normalize house share percentages
-    const totalHouseShare = borisHouseShare + christineHouseShare
-    const normalizedBorisHouseShare = totalHouseShare > 0 ? borisHouseShare / totalHouseShare : 0.5
-    const normalizedChristineHouseShare = totalHouseShare > 0 ? christineHouseShare / totalHouseShare : 0.5
+    const totalHouseShare = personAHouseShare + personBHouseShare
+    const normalizedPersonAHouseShare = totalHouseShare > 0 ? personAHouseShare / totalHouseShare : 0.5
+    const normalizedPersonBHouseShare = totalHouseShare > 0 ? personBHouseShare / totalHouseShare : 0.5
 
     // Calculate individual house values based on ownership split
-    const borisHouseValue = housePrice * normalizedBorisHouseShare
-    const christineHouseValue = housePrice * normalizedChristineHouseShare
+    const personAHouseValue = housePrice * normalizedPersonAHouseShare
+    const personBHouseValue = housePrice * normalizedPersonBHouseShare
     
     // CORRECT LOGIC: Individual loan need = House share - Individual contribution
-    const borisLoanNeed = Math.max(0, borisHouseValue - actualBorisContribution)
-    const christineLoanNeed = Math.max(0, christineHouseValue - actualChristineContribution)
-    const totalLoanNeeded = borisLoanNeed + christineLoanNeed
+    const personALoanNeed = Math.max(0, personAHouseValue - actualPersonAContribution)
+    const personBLoanNeed = Math.max(0, personBHouseValue - actualPersonBContribution)
+    const totalLoanNeeded = personALoanNeed + personBLoanNeed
     
     // Calculate monthly payments using PMT formula
     const monthlyInterestRate = interestRate / 100 / 12
     const numberOfPayments = loanTerm * 12
     
-    const borisMonthlyPayment = borisLoanNeed > 0 ? calculatePMT(monthlyInterestRate, numberOfPayments, borisLoanNeed) : 0
-    const christineMonthlyPayment = christineLoanNeed > 0 ? calculatePMT(monthlyInterestRate, numberOfPayments, christineLoanNeed) : 0
+    const personAMonthlyPayment = personALoanNeed > 0 ? calculatePMT(monthlyInterestRate, numberOfPayments, personALoanNeed) : 0
+    const personBMonthlyPayment = personBLoanNeed > 0 ? calculatePMT(monthlyInterestRate, numberOfPayments, personBLoanNeed) : 0
     
     // Calculate rental income shares
-    const borisRentalShare = hasRentalUnit ? rentalIncome * normalizedBorisShare : 0
-    const christineRentalShare = hasRentalUnit ? rentalIncome * normalizedChristineShare : 0
+    const personARentalShare = hasRentalUnit ? rentalIncome * normalizedPersonAShare : 0
+    const personBRentalShare = hasRentalUnit ? rentalIncome * normalizedPersonBShare : 0
     
     // Calculate final payments after rental income
-    const borisFinalPayment = borisMonthlyPayment - borisRentalShare
-    const christineFinalPayment = christineMonthlyPayment - christineRentalShare
-    const totalMonthlyPayment = borisFinalPayment + christineFinalPayment
+    const personAFinalPayment = personAMonthlyPayment - personARentalShare
+    const personBFinalPayment = personBMonthlyPayment - personBRentalShare
+    const totalMonthlyPayment = personAFinalPayment + personBFinalPayment
 
     // Calculate available cash after contributions
-    const borisAvailableCash = borisMaxContribution - actualBorisContribution
-    const christineAvailableCash = christineMaxContribution - actualChristineContribution
-    const totalAvailableCash = borisAvailableCash + christineAvailableCash
+    const personAAvailableCash = personAMaxContribution - actualPersonAContribution
+    const personBAvailableCash = personBMaxContribution - actualPersonBContribution
+    const totalAvailableCash = personAAvailableCash + personBAvailableCash
 
     // Calculate first month interest (IPMT)
-    const borisFirstInterest = borisLoanNeed > 0 ? calculateIPMT(monthlyInterestRate, borisLoanNeed) : 0
-    const christineFirstInterest = christineLoanNeed > 0 ? calculateIPMT(monthlyInterestRate, christineLoanNeed) : 0
+    const personAFirstInterest = personALoanNeed > 0 ? calculateIPMT(monthlyInterestRate, personALoanNeed) : 0
+    const personBFirstInterest = personBLoanNeed > 0 ? calculateIPMT(monthlyInterestRate, personBLoanNeed) : 0
 
     // Validations
-    const mortgageValidation = totalExistingMortgage - (borisExistingMortgage + christineExistingMortgage)
-    const houseShareValidation = (borisHouseShare + christineHouseShare) - 100
+    const mortgageValidation = totalExistingMortgage - (personAExistingMortgage + personBExistingMortgage)
+    const houseShareValidation = (personAHouseShare + personBHouseShare) - 100
 
     setCalculations({
-      borisGrossShare,
-      christineGrossShare,
-      borisNetProceeds,
-      christineNetProceeds,
+      personAGrossShare,
+      personBGrossShare,
+      personANetProceeds,
+      personBNetProceeds,
       totalNetProceeds,
-      borisMaxContribution,
-      christineMaxContribution,
+      personAMaxContribution,
+      personBMaxContribution,
       totalContribution,
-      borisHouseValue,
-      christineHouseValue,
-      borisLoanNeed,
-      christineLoanNeed,
+      personAHouseValue,
+      personBHouseValue,
+      personALoanNeed,
+      personBLoanNeed,
       totalLoanNeeded,
-      borisMonthlyPayment,
-      christineMonthlyPayment,
-      borisRentalShare,
-      christineRentalShare,
-      borisFinalPayment,
-      christineFinalPayment,
+      personAMonthlyPayment,
+      personBMonthlyPayment,
+      personARentalShare,
+      personBRentalShare,
+      personAFinalPayment,
+      personBFinalPayment,
       totalMonthlyPayment,
-      borisAvailableCash,
-      christineAvailableCash,
+      personAAvailableCash,
+      personBAvailableCash,
       totalAvailableCash,
-      borisFirstInterest,
-      christineFirstInterest,
+      personAFirstInterest,
+      personBFirstInterest,
       mortgageValidation,
       houseShareValidation
     })
 
     // Auto-update contribution fields if they haven't been manually set
-    if (!borisContribution) {
-      setBorisContribution(borisMaxContribution)
+    if (!personAContribution) {
+      setPersonAContribution(personAMaxContribution)
     }
-    if (!christineContribution) {
-      setChristineContribution(christineMaxContribution)
+    if (!personBContribution) {
+      setPersonBContribution(personBMaxContribution)
     }
-  }, [housePrice, borisCash, christineCash, flatSalePrice, totalExistingMortgage, borisExistingMortgage, christineExistingMortgage, borisFlatShare, christineFlatShare, borisContribution, christineContribution, borisHouseShare, christineHouseShare, grantedLoan, interestRate, loanTerm, hasRentalUnit, rentalIncome])
+  }, [housePrice, personACash, personBCash, flatSalePrice, totalExistingMortgage, personAExistingMortgage, personBExistingMortgage, personAFlatShare, personBFlatShare, personAContribution, personBContribution, personAHouseShare, personBHouseShare, grantedLoan, interestRate, loanTerm, hasRentalUnit, rentalIncome])
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('no-NO', {
@@ -190,6 +206,9 @@ function App() {
     return `${value.toFixed(1)}%`
   }
 
+  const aName = (personAName || '').trim() || 'Person A'
+  const bName = (personBName || '').trim() || 'Person B'
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-7xl mx-auto">
@@ -198,13 +217,70 @@ function App() {
             <Calculator className="h-8 w-8 text-blue-600" />
             <h1 className="text-4xl font-bold text-gray-900">Mortgage Calculator</h1>
           </div>
-          <p className="text-lg text-gray-600">Individual Payments for Boris & Christine</p>
+          <p className="text-lg text-gray-600">Individual Payments for {aName} & {bName}</p>
           <p className="text-sm text-gray-500">With Correct Loan Distribution Logic</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Input Section */}
           <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Participants
+                </CardTitle>
+                <CardDescription>Set names for personalization</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="personAName">{aName} Name</Label>
+                    <Input
+                      id="personAName"
+                      type="text"
+                      value={personAName}
+                      onChange={(e) => setPersonAName(e.target.value)}
+                      className="mt-1"
+                      placeholder="Enter name"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="personBName">{bName} Name</Label>
+                    <Input
+                      id="personBName"
+                      type="text"
+                      value={personBName}
+                      onChange={(e) => setPersonBName(e.target.value)}
+                      className="mt-1"
+                      placeholder="Enter name"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="personAColor">{aName} Color</Label>
+                    <Input
+                      id="personAColor"
+                      type="color"
+                      value={personAColor}
+                      onChange={(e) => setPersonAColor(e.target.value)}
+                      className="mt-1 h-10 p-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="personBColor">{bName} Color</Label>
+                    <Input
+                      id="personBColor"
+                      type="color"
+                      value={personBColor}
+                      onChange={(e) => setPersonBColor(e.target.value)}
+                      className="mt-1 h-10 p-1"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -271,22 +347,22 @@ function App() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="borisCash">Boris's Cash (NOK)</Label>
+                    <Label htmlFor="personACash">{aName} Cash (NOK)</Label>
                     <Input
-                      id="borisCash"
+                      id="personACash"
                       type="number"
-                      value={borisCash}
-                      onChange={(e) => setBorisCash(Number(e.target.value))}
+                      value={personACash}
+                      onChange={(e) => setPersonACash(Number(e.target.value))}
                       className="mt-1"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="christineCash">Christine's Cash (NOK)</Label>
+                    <Label htmlFor="personBCash">{bName} Cash (NOK)</Label>
                     <Input
-                      id="christineCash"
+                      id="personBCash"
                       type="number"
-                      value={christineCash}
-                      onChange={(e) => setChristineCash(Number(e.target.value))}
+                      value={personBCash}
+                      onChange={(e) => setPersonBCash(Number(e.target.value))}
                       className="mt-1"
                     />
                   </div>
@@ -329,25 +405,25 @@ function App() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="borisExistingMortgage">Boris's Mortgage Share (NOK)</Label>
+                    <Label htmlFor="personAExistingMortgage">{aName} Mortgage Share (NOK)</Label>
                     <Input
-                      id="borisExistingMortgage"
+                      id="personAExistingMortgage"
                       type="number"
-                      value={borisExistingMortgage}
-                      onChange={(e) => setBorisExistingMortgage(Number(e.target.value))}
+                      value={personAExistingMortgage}
+                      onChange={(e) => setPersonAExistingMortgage(Number(e.target.value))}
                       className="mt-1 bg-red-50 border-red-200"
-                      placeholder="Boris's share of mortgage"
+                      placeholder={`${aName}'s share of mortgage`}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="christineExistingMortgage">Christine's Mortgage Share (NOK)</Label>
+                    <Label htmlFor="personBExistingMortgage">{bName} Mortgage Share (NOK)</Label>
                     <Input
-                      id="christineExistingMortgage"
+                      id="personBExistingMortgage"
                       type="number"
-                      value={christineExistingMortgage}
-                      onChange={(e) => setChristineExistingMortgage(Number(e.target.value))}
+                      value={personBExistingMortgage}
+                      onChange={(e) => setPersonBExistingMortgage(Number(e.target.value))}
                       className="mt-1 bg-red-50 border-red-200"
-                      placeholder="Christine's share of mortgage"
+                      placeholder={`${bName}'s share of mortgage`}
                     />
                   </div>
                 </div>
@@ -359,7 +435,7 @@ function App() {
                       <p className="text-yellow-800 font-medium text-sm">Mortgage Share Mismatch</p>
                     </div>
                     <p className="text-yellow-700 text-xs mt-1">
-                      Individual shares ({formatCurrency(borisExistingMortgage + christineExistingMortgage)}) 
+                      Individual shares ({formatCurrency(personAExistingMortgage + personBExistingMortgage)}) 
                       don't match total ({formatCurrency(totalExistingMortgage)})
                     </p>
                   </div>
@@ -367,42 +443,48 @@ function App() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="borisFlatShare">Boris's Flat Sale Share (%)</Label>
+                    <Label htmlFor="personAFlatShare">{aName} Flat Sale Share (%)</Label>
                     <Input
-                      id="borisFlatShare"
+                      id="personAFlatShare"
                       type="number"
                       step="0.1"
-                      value={borisFlatShare}
-                      onChange={(e) => setBorisFlatShare(Number(e.target.value))}
+                      value={personAFlatShare}
+                      onChange={(e) => setPersonAFlatShare(Number(e.target.value))}
                       className="mt-1"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="christineFlatShare">Christine's Flat Sale Share (%)</Label>
+                    <Label htmlFor="personBFlatShare">{bName} Flat Sale Share (%)</Label>
                     <Input
-                      id="christineFlatShare"
+                      id="personBFlatShare"
                       type="number"
                       step="0.1"
-                      value={christineFlatShare}
-                      onChange={(e) => setChristineFlatShare(Number(e.target.value))}
+                      value={personBFlatShare}
+                      onChange={(e) => setPersonBFlatShare(Number(e.target.value))}
                       className="mt-1"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-blue-600 font-medium">Boris's Net Proceeds</p>
-                    <p className="text-lg font-bold text-blue-800">{formatCurrency(calculations.borisNetProceeds)}</p>
-                    <p className="text-xs text-blue-600">
-                      {formatCurrency(calculations.borisGrossShare)} - {formatCurrency(borisExistingMortgage)}
+                  <div
+                    className="p-3 rounded-lg"
+                    style={{ backgroundColor: hexToRgba(personAColor, 0.08) }}
+                  >
+                    <p className="text-sm font-medium" style={{ color: personAColor }}>{aName} Net Proceeds</p>
+                    <p className="text-lg font-bold" style={{ color: personAColor }}>{formatCurrency(calculations.personANetProceeds)}</p>
+                    <p className="text-xs" style={{ color: hexToRgba(personAColor, 0.9) }}>
+                      {formatCurrency(calculations.personAGrossShare)} - {formatCurrency(personAExistingMortgage)}
                     </p>
                   </div>
-                  <div className="p-3 bg-pink-50 rounded-lg">
-                    <p className="text-sm text-pink-600 font-medium">Christine's Net Proceeds</p>
-                    <p className="text-lg font-bold text-pink-800">{formatCurrency(calculations.christineNetProceeds)}</p>
-                    <p className="text-xs text-pink-600">
-                      {formatCurrency(calculations.christineGrossShare)} - {formatCurrency(christineExistingMortgage)}
+                  <div
+                    className="p-3 rounded-lg"
+                    style={{ backgroundColor: hexToRgba(personBColor, 0.08) }}
+                  >
+                    <p className="text-sm font-medium" style={{ color: personBColor }}>{bName} Net Proceeds</p>
+                    <p className="text-lg font-bold" style={{ color: personBColor }}>{formatCurrency(calculations.personBNetProceeds)}</p>
+                    <p className="text-xs" style={{ color: hexToRgba(personBColor, 0.9) }}>
+                      {formatCurrency(calculations.personBGrossShare)} - {formatCurrency(personBExistingMortgage)}
                     </p>
                   </div>
                 </div>
@@ -419,34 +501,34 @@ function App() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="borisContribution">Boris's Contribution (NOK)</Label>
+                  <Label htmlFor="personAContribution">{aName} Contribution (NOK)</Label>
                   <Input
-                    id="borisContribution"
+                    id="personAContribution"
                     type="number"
-                    value={borisContribution}
-                    onChange={(e) => setBorisContribution(Number(e.target.value))}
+                    value={personAContribution}
+                    onChange={(e) => setPersonAContribution(Number(e.target.value))}
                     className="mt-1 bg-orange-50 border-orange-200"
-                    placeholder={`Max: ${formatCurrency(calculations.borisMaxContribution)}`}
+                    placeholder={`Max: ${formatCurrency(calculations.personAMaxContribution)}`}
                   />
                   <p className="text-xs text-gray-600 mt-1">
-                    Max available: {formatCurrency(calculations.borisMaxContribution)} 
-                    (Cash: {formatCurrency(borisCash)} + Net Flat: {formatCurrency(calculations.borisNetProceeds)})
+                    Max available: {formatCurrency(calculations.personAMaxContribution)} 
+                    (Cash: {formatCurrency(personACash)} + Net Flat: {formatCurrency(calculations.personANetProceeds)})
                   </p>
                 </div>
                 
                 <div>
-                  <Label htmlFor="christineContribution">Christine's Contribution (NOK)</Label>
+                  <Label htmlFor="personBContribution">{bName} Contribution (NOK)</Label>
                   <Input
-                    id="christineContribution"
+                    id="personBContribution"
                     type="number"
-                    value={christineContribution}
-                    onChange={(e) => setChristineContribution(Number(e.target.value))}
+                    value={personBContribution}
+                    onChange={(e) => setPersonBContribution(Number(e.target.value))}
                     className="mt-1 bg-orange-50 border-orange-200"
-                    placeholder={`Max: ${formatCurrency(calculations.christineMaxContribution)}`}
+                    placeholder={`Max: ${formatCurrency(calculations.personBMaxContribution)}`}
                   />
                   <p className="text-xs text-gray-600 mt-1">
-                    Max available: {formatCurrency(calculations.christineMaxContribution)} 
-                    (Cash: {formatCurrency(christineCash)} + Net Flat: {formatCurrency(calculations.christineNetProceeds)})
+                    Max available: {formatCurrency(calculations.personBMaxContribution)} 
+                    (Cash: {formatCurrency(personBCash)} + Net Flat: {formatCurrency(calculations.personBNetProceeds)})
                   </p>
                 </div>
 
@@ -459,30 +541,30 @@ function App() {
 
             <Card>
               <CardHeader>
-                <CardTitle>House Ownership Split</CardTitle>
+                <CardTitle>Ownership Split</CardTitle>
                 <CardDescription>How will house ownership be split?</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="borisHouseShare">Boris's Ownership (%)</Label>
+                    <Label htmlFor="personAHouseShare">{aName} Ownership (%)</Label>
                     <Input
-                      id="borisHouseShare"
+                      id="personAHouseShare"
                       type="number"
                       step="0.1"
-                      value={borisHouseShare}
-                      onChange={(e) => setBorisHouseShare(Number(e.target.value))}
+                      value={personAHouseShare}
+                      onChange={(e) => setPersonAHouseShare(Number(e.target.value))}
                       className="mt-1 bg-blue-50 border-blue-200"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="christineHouseShare">Christine's Ownership (%)</Label>
+                    <Label htmlFor="personBHouseShare">{bName} Ownership (%)</Label>
                     <Input
-                      id="christineHouseShare"
+                      id="personBHouseShare"
                       type="number"
                       step="0.1"
-                      value={christineHouseShare}
-                      onChange={(e) => setChristineHouseShare(Number(e.target.value))}
+                      value={personBHouseShare}
+                      onChange={(e) => setPersonBHouseShare(Number(e.target.value))}
                       className="mt-1 bg-blue-50 border-blue-200"
                     />
                   </div>
@@ -494,7 +576,7 @@ function App() {
                       <p className="text-yellow-800 font-medium text-sm">Ownership Split Mismatch</p>
                     </div>
                     <p className="text-yellow-700 text-xs mt-1">
-                      Ownership percentages ({formatPercentage(borisHouseShare + christineHouseShare)}) 
+                      Ownership percentages ({formatPercentage(personAHouseShare + personBHouseShare)}) 
                       do not add up to 100%
                     </p>
                   </div>
@@ -502,17 +584,17 @@ function App() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-3 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-blue-600 font-medium">Boris's House Value</p>
-                    <p className="text-lg font-bold text-blue-800">{formatCurrency(calculations.borisHouseValue)}</p>
+                    <p className="text-sm text-blue-600 font-medium">{aName} House Value</p>
+                    <p className="text-lg font-bold text-blue-800">{formatCurrency(calculations.personAHouseValue)}</p>
                     <p className="text-xs text-blue-600">
-                      {formatPercentage(borisHouseShare)} of {formatCurrency(housePrice)}
+                      {formatPercentage(personAHouseShare)} of {formatCurrency(housePrice)}
                     </p>
                   </div>
                   <div className="p-3 bg-pink-50 rounded-lg">
-                    <p className="text-sm text-pink-600 font-medium">Christine's House Value</p>
-                    <p className="text-lg font-bold text-pink-800">{formatCurrency(calculations.christineHouseValue)}</p>
+                    <p className="text-sm text-pink-600 font-medium">{bName} House Value</p>
+                    <p className="text-lg font-bold text-pink-800">{formatCurrency(calculations.personBHouseValue)}</p>
                     <p className="text-xs text-pink-600">
-                      {formatPercentage(christineHouseShare)} of {formatCurrency(housePrice)}
+                      {formatPercentage(personBHouseShare)} of {formatCurrency(housePrice)}
                     </p>
                   </div>
                 </div>
@@ -552,42 +634,42 @@ function App() {
 
           {/* Individual Results Section */}
           <div className="space-y-6">
-            <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
+            <Card className="border" style={{ background: `linear-gradient(90deg, ${hexToRgba(personAColor, 0.06)}, ${hexToRgba(personAColor, 0.12)})`, borderColor: hexToRgba(personAColor, 0.4) }}>
               <CardHeader>
-                <CardTitle className="text-blue-800">Boris's Monthly Payment</CardTitle>
+                <CardTitle style={{ color: personAColor }}>{aName} Monthly Payment</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-blue-700 mb-2">
-                  {formatCurrency(calculations.borisFinalPayment)}
+                <div className="text-3xl font-bold mb-2" style={{ color: personAColor }}>
+                  {formatCurrency(calculations.personAFinalPayment)}
                 </div>
-                <p className="text-blue-600 text-sm">
+                <p className="text-sm" style={{ color: hexToRgba(personAColor, 0.9) }}>
                   {hasRentalUnit ? 
-                    `PMT: ${formatCurrency(calculations.borisMonthlyPayment)} - Rental: ${formatCurrency(calculations.borisRentalShare)}` : 
+                    `PMT: ${formatCurrency(calculations.personAMonthlyPayment)} - Rental: ${formatCurrency(calculations.personARentalShare)}` : 
                     'Monthly mortgage payment (PMT)'
                   }
                 </p>
-                <p className="text-blue-500 text-xs mt-1">
-                  Loan Need: {formatCurrency(calculations.borisLoanNeed)}
+                <p className="text-xs mt-1" style={{ color: hexToRgba(personAColor, 0.8) }}>
+                  Loan Need: {formatCurrency(calculations.personALoanNeed)}
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-r from-pink-50 to-pink-100 border-pink-200">
+            <Card className="border" style={{ background: `linear-gradient(90deg, ${hexToRgba(personBColor, 0.06)}, ${hexToRgba(personBColor, 0.12)})`, borderColor: hexToRgba(personBColor, 0.4) }}>
               <CardHeader>
-                <CardTitle className="text-pink-800">Christine's Monthly Payment</CardTitle>
+                <CardTitle style={{ color: personBColor }}>{bName} Monthly Payment</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-pink-700 mb-2">
-                  {formatCurrency(calculations.christineFinalPayment)}
+                <div className="text-3xl font-bold mb-2" style={{ color: personBColor }}>
+                  {formatCurrency(calculations.personBFinalPayment)}
                 </div>
-                <p className="text-pink-600 text-sm">
+                <p className="text-sm" style={{ color: hexToRgba(personBColor, 0.9) }}>
                   {hasRentalUnit ? 
-                    `PMT: ${formatCurrency(calculations.christineMonthlyPayment)} - Rental: ${formatCurrency(calculations.christineRentalShare)}` : 
+                    `PMT: ${formatCurrency(calculations.personBMonthlyPayment)} - Rental: ${formatCurrency(calculations.personBRentalShare)}` : 
                     'Monthly mortgage payment (PMT)'
                   }
                 </p>
-                <p className="text-pink-500 text-xs mt-1">
-                  Loan Need: {formatCurrency(calculations.christineLoanNeed)}
+                <p className="text-xs mt-1" style={{ color: hexToRgba(personBColor, 0.8) }}>
+                  Loan Need: {formatCurrency(calculations.personBLoanNeed)}
                 </p>
               </CardContent>
             </Card>
@@ -605,7 +687,7 @@ function App() {
                 </div>
                 <p className="text-green-600">Combined monthly payment</p>
                 <p className="text-green-500 text-xs mt-1">
-                  Base PMT: {formatCurrency(calculations.borisMonthlyPayment + calculations.christineMonthlyPayment)}
+                  Base PMT: {formatCurrency(calculations.personAMonthlyPayment + calculations.personBMonthlyPayment)}
                 </p>
               </CardContent>
             </Card>
@@ -616,18 +698,18 @@ function App() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-blue-600 font-medium">Boris's Loan Need</p>
-                    <p className="text-xl font-bold text-blue-800">{formatCurrency(calculations.borisLoanNeed)}</p>
-                    <p className="text-xs text-blue-600">
-                      House: {formatCurrency(calculations.borisHouseValue)} - Contribution: {formatCurrency(borisContribution)}
+                  <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personAColor, 0.08) }}>
+                    <p className="text-sm font-medium" style={{ color: personAColor }}>{aName} Loan Need</p>
+                    <p className="text-xl font-bold" style={{ color: personAColor }}>{formatCurrency(calculations.personALoanNeed)}</p>
+                    <p className="text-xs" style={{ color: hexToRgba(personAColor, 0.9) }}>
+                      House: {formatCurrency(calculations.personAHouseValue)} - Contribution: {formatCurrency(personAContribution)}
                     </p>
                   </div>
-                  <div className="p-3 bg-pink-50 rounded-lg">
-                    <p className="text-sm text-pink-600 font-medium">Christine's Loan Need</p>
-                    <p className="text-xl font-bold text-pink-800">{formatCurrency(calculations.christineLoanNeed)}</p>
-                    <p className="text-xs text-pink-600">
-                      House: {formatCurrency(calculations.christineHouseValue)} - Contribution: {formatCurrency(christineContribution)}
+                  <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personBColor, 0.08) }}>
+                    <p className="text-sm font-medium" style={{ color: personBColor }}>{bName} Loan Need</p>
+                    <p className="text-xl font-bold" style={{ color: personBColor }}>{formatCurrency(calculations.personBLoanNeed)}</p>
+                    <p className="text-xs" style={{ color: hexToRgba(personBColor, 0.9) }}>
+                      House: {formatCurrency(calculations.personBHouseValue)} - Contribution: {formatCurrency(personBContribution)}
                     </p>
                   </div>
                 </div>
@@ -644,15 +726,15 @@ function App() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-blue-600 font-medium">Boris's Cash Left</p>
-                    <p className="text-xl font-bold text-blue-800">{formatCurrency(calculations.borisAvailableCash)}</p>
-                    <p className="text-xs text-blue-600">Available - Contributed</p>
+                  <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personAColor, 0.08) }}>
+                    <p className="text-sm font-medium" style={{ color: personAColor }}>{aName} Cash Left</p>
+                    <p className="text-xl font-bold" style={{ color: personAColor }}>{formatCurrency(calculations.personAAvailableCash)}</p>
+                    <p className="text-xs" style={{ color: hexToRgba(personAColor, 0.9) }}>Available - Contributed</p>
                   </div>
-                  <div className="p-3 bg-pink-50 rounded-lg">
-                    <p className="text-sm text-pink-600 font-medium">Christine's Cash Left</p>
-                    <p className="text-xl font-bold text-pink-800">{formatCurrency(calculations.christineAvailableCash)}</p>
-                    <p className="text-xs text-pink-600">Available - Contributed</p>
+                  <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personBColor, 0.08) }}>
+                    <p className="text-sm font-medium" style={{ color: personBColor }}>{bName} Cash Left</p>
+                    <p className="text-xl font-bold" style={{ color: personBColor }}>{formatCurrency(calculations.personBAvailableCash)}</p>
+                    <p className="text-xs" style={{ color: hexToRgba(personBColor, 0.9) }}>Available - Contributed</p>
                   </div>
                 </div>
                 <div className="p-3 bg-gray-50 rounded-lg">
@@ -669,14 +751,14 @@ function App() {
               <CardContent className="space-y-2">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="text-blue-600 font-medium">Boris</p>
-                    <p>Interest: {formatCurrency(calculations.borisFirstInterest)}</p>
-                    <p>Principal: {formatCurrency(calculations.borisMonthlyPayment - calculations.borisFirstInterest)}</p>
+                    <p className="font-medium" style={{ color: personAColor }}>{aName}</p>
+                    <p>Interest: {formatCurrency(calculations.personAFirstInterest)}</p>
+                    <p>Principal: {formatCurrency(calculations.personAMonthlyPayment - calculations.personAFirstInterest)}</p>
                   </div>
                   <div>
-                    <p className="text-pink-600 font-medium">Christine</p>
-                    <p>Interest: {formatCurrency(calculations.christineFirstInterest)}</p>
-                    <p>Principal: {formatCurrency(calculations.christineMonthlyPayment - calculations.christineFirstInterest)}</p>
+                    <p className="font-medium" style={{ color: personBColor }}>{bName}</p>
+                    <p>Interest: {formatCurrency(calculations.personBFirstInterest)}</p>
+                    <p>Principal: {formatCurrency(calculations.personBMonthlyPayment - calculations.personBFirstInterest)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -720,7 +802,7 @@ function App() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Total Cash Available:</span>
-                    <span className="font-semibold">{formatCurrency(borisCash + christineCash + calculations.totalNetProceeds)}</span>
+                    <span className="font-semibold">{formatCurrency(personACash + personBCash + calculations.totalNetProceeds)}</span>
                   </div>
                   <div className="flex justify-between border-t pt-2">
                     <span className="text-gray-600">Total Loan Needed:</span>
@@ -755,20 +837,20 @@ function App() {
                 
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Boris contributes:</span>
-                    <span className="font-semibold">{formatCurrency(borisContribution)}</span>
+                    <span className="text-gray-600">{aName} contributes:</span>
+                    <span className="font-semibold">{formatCurrency(personAContribution)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Christine contributes:</span>
-                    <span className="font-semibold">{formatCurrency(christineContribution)}</span>
+                    <span className="text-gray-600">{bName} contributes:</span>
+                    <span className="font-semibold">{formatCurrency(personBContribution)}</span>
                   </div>
                   <div className="flex justify-between border-t pt-2">
-                    <span className="text-gray-600">Boris needs loan:</span>
-                    <span className="font-semibold">{formatCurrency(calculations.borisLoanNeed)}</span>
+                    <span className="text-gray-600">{aName} needs loan:</span>
+                    <span className="font-semibold">{formatCurrency(calculations.personALoanNeed)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Christine needs loan:</span>
-                    <span className="font-semibold">{formatCurrency(calculations.christineLoanNeed)}</span>
+                    <span className="text-gray-600">{bName} needs loan:</span>
+                    <span className="font-semibold">{formatCurrency(calculations.personBLoanNeed)}</span>
                   </div>
                 </div>
               </CardContent>
@@ -793,7 +875,7 @@ function App() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total Interest:</span>
-                  <span className="font-semibold">{formatCurrency((calculations.borisMonthlyPayment + calculations.christineMonthlyPayment) * loanTerm * 12 - calculations.totalLoanNeeded)}</span>
+                  <span className="font-semibold">{formatCurrency((calculations.personAMonthlyPayment + calculations.personBMonthlyPayment) * loanTerm * 12 - calculations.totalLoanNeeded)}</span>
                 </div>
               </CardContent>
             </Card>
