@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input.jsx'
 import { Label } from '@/components/ui/label.jsx'
 import { Switch } from '@/components/ui/switch.jsx'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.jsx'
 import { Calculator, Home, DollarSign, TrendingUp, Users, Banknote, AlertTriangle } from 'lucide-react'
 import './App.css'
 
@@ -30,6 +31,9 @@ function App() {
   const [loanTerm, setLoanTerm] = useState(30)
   const [hasRentalUnit, setHasRentalUnit] = useState(false)
   const [rentalIncome, setRentalIncome] = useState(0)
+
+  // Currency setting
+  const [currency, setCurrency] = useState('NOK')
 
   const [calculations, setCalculations] = useState({
     personAGrossShare: 0,
@@ -184,19 +188,20 @@ function App() {
       houseShareValidation
     })
 
-    // Auto-update contribution fields if they haven't been manually set
-    if (!personAContribution) {
+    // Auto-update contribution fields to always match Max available
+    if (personAContribution !== personAMaxContribution) {
       setPersonAContribution(personAMaxContribution)
     }
-    if (!personBContribution) {
+    if (personBContribution !== personBMaxContribution) {
       setPersonBContribution(personBMaxContribution)
     }
   }, [housePrice, personACash, personBCash, flatSalePrice, totalExistingMortgage, personAExistingMortgage, personBExistingMortgage, personAFlatShare, personBFlatShare, personAContribution, personBContribution, personAHouseShare, personBHouseShare, grantedLoan, interestRate, loanTerm, hasRentalUnit, rentalIncome])
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('no-NO', {
+    const browserLocale = typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en-US'
+    return new Intl.NumberFormat(browserLocale, {
       style: 'currency',
-      currency: 'NOK',
+      currency,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(amount)
@@ -219,6 +224,28 @@ function App() {
           </div>
           <p className="text-lg text-gray-600">Individual Payments for {aName} & {bName}</p>
           <p className="text-sm text-gray-500">With Correct Loan Distribution Logic</p>
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <div className="flex items-center gap-2">
+              <Label>Currency</Label>
+              <Select value={currency} onValueChange={setCurrency}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="NOK">NOK — Norwegian Krone</SelectItem>
+                  <SelectItem value="USD">USD — US Dollar</SelectItem>
+                  <SelectItem value="EUR">EUR — Euro</SelectItem>
+                  <SelectItem value="GBP">GBP — British Pound</SelectItem>
+                  <SelectItem value="SEK">SEK — Swedish Krona</SelectItem>
+                  <SelectItem value="DKK">DKK — Danish Krone</SelectItem>
+                  <SelectItem value="CHF">CHF — Swiss Franc</SelectItem>
+                  <SelectItem value="CAD">CAD — Canadian Dollar</SelectItem>
+                  <SelectItem value="AUD">AUD — Australian Dollar</SelectItem>
+                  <SelectItem value="JPY">JPY — Japanese Yen</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -291,7 +318,7 @@ function App() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="housePrice">House Price (NOK)</Label>
+                  <Label htmlFor="housePrice">House Price ({currency})</Label>
                   <Input
                     id="housePrice"
                     type="number"
@@ -301,7 +328,7 @@ function App() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="grantedLoan">Granted Loan (NOK)</Label>
+                  <Label htmlFor="grantedLoan">Granted Loan ({currency})</Label>
                   <Input
                     id="grantedLoan"
                     type="number"
@@ -347,7 +374,7 @@ function App() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="personACash">{aName} Cash (NOK)</Label>
+                    <Label htmlFor="personACash">{aName} Cash ({currency})</Label>
                     <Input
                       id="personACash"
                       type="number"
@@ -357,7 +384,7 @@ function App() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="personBCash">{bName} Cash (NOK)</Label>
+                    <Label htmlFor="personBCash">{bName} Cash ({currency})</Label>
                     <Input
                       id="personBCash"
                       type="number"
@@ -380,7 +407,7 @@ function App() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="flatSalePrice">Current Flat Sale Price (NOK)</Label>
+                  <Label htmlFor="flatSalePrice">Current Flat Sale Price ({currency})</Label>
                   <Input
                     id="flatSalePrice"
                     type="number"
@@ -392,7 +419,7 @@ function App() {
                 </div>
                 
                 <div>
-                  <Label htmlFor="totalExistingMortgage">Total Existing Flat Mortgage (NOK)</Label>
+                  <Label htmlFor="totalExistingMortgage">Total Existing Flat Mortgage ({currency})</Label>
                   <Input
                     id="totalExistingMortgage"
                     type="number"
@@ -405,7 +432,7 @@ function App() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="personAExistingMortgage">{aName} Mortgage Share (NOK)</Label>
+                    <Label htmlFor="personAExistingMortgage">{aName} Mortgage Share ({currency})</Label>
                     <Input
                       id="personAExistingMortgage"
                       type="number"
@@ -416,7 +443,7 @@ function App() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="personBExistingMortgage">{bName} Mortgage Share (NOK)</Label>
+                    <Label htmlFor="personBExistingMortgage">{bName} Mortgage Share ({currency})</Label>
                     <Input
                       id="personBExistingMortgage"
                       type="number"
@@ -501,7 +528,7 @@ function App() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="personAContribution">{aName} Contribution (NOK)</Label>
+                  <Label htmlFor="personAContribution">{aName} Contribution ({currency})</Label>
                   <Input
                     id="personAContribution"
                     type="number"
@@ -517,7 +544,7 @@ function App() {
                 </div>
                 
                 <div>
-                  <Label htmlFor="personBContribution">{bName} Contribution (NOK)</Label>
+                  <Label htmlFor="personBContribution">{bName} Contribution ({currency})</Label>
                   <Input
                     id="personBContribution"
                     type="number"
@@ -583,17 +610,17 @@ function App() {
                 )}
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-blue-600 font-medium">{aName} House Value</p>
-                    <p className="text-lg font-bold text-blue-800">{formatCurrency(calculations.personAHouseValue)}</p>
-                    <p className="text-xs text-blue-600">
+                  <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personAColor, 0.08) }}>
+                    <p className="text-sm font-medium" style={{ color: personAColor }}>{aName} House Value</p>
+                    <p className="text-lg font-bold" style={{ color: personAColor }}>{formatCurrency(calculations.personAHouseValue)}</p>
+                    <p className="text-xs" style={{ color: hexToRgba(personAColor, 0.9) }}>
                       {formatPercentage(personAHouseShare)} of {formatCurrency(housePrice)}
                     </p>
                   </div>
-                  <div className="p-3 bg-pink-50 rounded-lg">
-                    <p className="text-sm text-pink-600 font-medium">{bName} House Value</p>
-                    <p className="text-lg font-bold text-pink-800">{formatCurrency(calculations.personBHouseValue)}</p>
-                    <p className="text-xs text-pink-600">
+                  <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personBColor, 0.08) }}>
+                    <p className="text-sm font-medium" style={{ color: personBColor }}>{bName} House Value</p>
+                    <p className="text-lg font-bold" style={{ color: personBColor }}>{formatCurrency(calculations.personBHouseValue)}</p>
+                    <p className="text-xs" style={{ color: hexToRgba(personBColor, 0.9) }}>
                       {formatPercentage(personBHouseShare)} of {formatCurrency(housePrice)}
                     </p>
                   </div>
@@ -617,7 +644,7 @@ function App() {
                 </div>
                 {hasRentalUnit && (
                   <div>
-                    <Label htmlFor="rentalIncome">Monthly Rental Income (NOK)</Label>
+                    <Label htmlFor="rentalIncome">Monthly Rental Income ({currency})</Label>
                     <Input
                       id="rentalIncome"
                       type="number"
