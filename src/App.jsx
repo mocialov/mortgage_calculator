@@ -31,6 +31,16 @@ function App() {
   const [loanTerm, setLoanTerm] = useState(30)
   const [hasRentalUnit, setHasRentalUnit] = useState(false)
   const [rentalIncome, setRentalIncome] = useState(0)
+  // Mobile stepper (only affects small screens)
+  const inputSteps = [
+    'Current Flat Details',
+    'Individual Cash',
+    'New House Details',
+    'Contributions to New Mortgage',
+    'Ownership Split',
+    'Rental Unit'
+  ]
+  const [currentStep, setCurrentStep] = useState(0)
 
   // Currency setting
   const [currency, setCurrency] = useState('NOK')
@@ -248,67 +258,108 @@ function App() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Full-width Participants */}
+        <div className="mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Participants
+              </CardTitle>
+              <CardDescription>Set names and colors for personalization</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="personAName">{aName} Name</Label>
+                  <Input
+                    id="personAName"
+                    type="text"
+                    value={personAName}
+                    onChange={(e) => setPersonAName(e.target.value)}
+                    className="mt-1"
+                    placeholder="Enter name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="personBName">{bName} Name</Label>
+                  <Input
+                    id="personBName"
+                    type="text"
+                    value={personBName}
+                    onChange={(e) => setPersonBName(e.target.value)}
+                    className="mt-1"
+                    placeholder="Enter name"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="personAColor">{aName} Color</Label>
+                  <Input
+                    id="personAColor"
+                    type="color"
+                    value={personAColor}
+                    onChange={(e) => setPersonAColor(e.target.value)}
+                    className="mt-1 h-10 p-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="personBColor">{bName} Color</Label>
+                  <Input
+                    id="personBColor"
+                    type="color"
+                    value={personBColor}
+                    onChange={(e) => setPersonBColor(e.target.value)}
+                    className="mt-1 h-10 p-1"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        <div className="border-t border-gray-200 my-6" />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Input Section */}
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Participants
-                </CardTitle>
-                <CardDescription>Set names for personalization</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="personAName">{aName} Name</Label>
-                    <Input
-                      id="personAName"
-                      type="text"
-                      value={personAName}
-                      onChange={(e) => setPersonAName(e.target.value)}
-                      className="mt-1"
-                      placeholder="Enter name"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="personBName">{bName} Name</Label>
-                    <Input
-                      id="personBName"
-                      type="text"
-                      value={personBName}
-                      onChange={(e) => setPersonBName(e.target.value)}
-                      className="mt-1"
-                      placeholder="Enter name"
-                    />
-                  </div>
+            {/* Mobile stepper controls */}
+            <div className="lg:hidden sticky top-0 z-10 -mx-4 px-4 py-3 bg-gradient-to-br from-blue-50/90 to-indigo-100/90 backdrop-blur">
+              <div className="flex items-center justify-between">
+                <button
+                  className="text-sm px-3 py-1 rounded-md bg-white/70 border disabled:opacity-50"
+                  onClick={() => setCurrentStep((s) => Math.max(0, s - 1))}
+                  disabled={currentStep === 0}
+                >
+                  Back
+                </button>
+                <div className="text-sm font-medium">
+                  Step {currentStep + 1} of {inputSteps.length}
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="personAColor">{aName} Color</Label>
-                    <Input
-                      id="personAColor"
-                      type="color"
-                      value={personAColor}
-                      onChange={(e) => setPersonAColor(e.target.value)}
-                      className="mt-1 h-10 p-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="personBColor">{bName} Color</Label>
-                    <Input
-                      id="personBColor"
-                      type="color"
-                      value={personBColor}
-                      onChange={(e) => setPersonBColor(e.target.value)}
-                      className="mt-1 h-10 p-1"
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
+                <button
+                  className="text-sm px-3 py-1 rounded-md bg-blue-600 text-white disabled:opacity-50"
+                  onClick={() => setCurrentStep((s) => Math.min(inputSteps.length - 1, s + 1))}
+                  disabled={currentStep === inputSteps.length - 1}
+                >
+                  Next
+                </button>
+              </div>
+              <div className="mt-2 flex gap-1 justify-center">
+                {inputSteps.map((_, idx) => (
+                  <button
+                    key={idx}
+                    aria-label={`Go to step ${idx + 1}`}
+                    className={`${currentStep === idx ? 'bg-blue-600' : 'bg-blue-300'} h-1.5 w-6 rounded-full`}
+                    onClick={() => setCurrentStep(idx)}
+                  />
+                ))}
+              </div>
+            </div>
+            {/* Section: New House Details */}
+            <h2 className="text-sm font-semibold text-gray-700 px-1 flex items-center gap-2">
+              <Home className="h-4 w-4 text-gray-500" /> New House Details
+            </h2>
+            <Card className={`${currentStep === 2 ? 'block' : 'hidden'} lg:block`}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Home className="h-5 w-5" />
@@ -363,7 +414,127 @@ function App() {
               </CardContent>
             </Card>
 
-            <Card>
+            {/* Section: Current Mortgages (moved above Individual Cash) */}
+            <div className="border-t border-gray-200 my-4" />
+            <h2 className="text-sm font-semibold text-gray-700 px-1 flex items-center gap-2">
+              <Banknote className="h-4 w-4 text-gray-500" /> Current Mortgages
+            </h2>
+            <Card className={`${currentStep === 0 ? 'block' : 'hidden'} lg:block`}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Banknote className="h-5 w-5" />
+                  Current Flat Details
+                </CardTitle>
+                <CardDescription>Current flat sale and individual mortgage shares</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="flatSalePrice">Current Flat Sale Price ({currency})</Label>
+                  <Input
+                    id="flatSalePrice"
+                    type="number"
+                    value={flatSalePrice}
+                    onChange={(e) => setFlatSalePrice(Number(e.target.value))}
+                    className="mt-1"
+                    placeholder="Enter expected sale price"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="totalExistingMortgage">Total Existing Flat Mortgage ({currency})</Label>
+                  <Input
+                    id="totalExistingMortgage"
+                    type="number"
+                    value={totalExistingMortgage}
+                    onChange={(e) => setTotalExistingMortgage(Number(e.target.value))}
+                    className="mt-1"
+                    placeholder="Total amount still owed"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="personAExistingMortgage">{aName} Mortgage Share ({currency})</Label>
+                    <Input
+                      id="personAExistingMortgage"
+                      type="number"
+                      value={personAExistingMortgage}
+                      onChange={(e) => setPersonAExistingMortgage(Number(e.target.value))}
+                      className="mt-1 bg-red-50 border-red-200"
+                      placeholder={`${aName}'s share of mortgage`}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="personBExistingMortgage">{bName} Mortgage Share ({currency})</Label>
+                    <Input
+                      id="personBExistingMortgage"
+                      type="number"
+                      value={personBExistingMortgage}
+                      onChange={(e) => setPersonBExistingMortgage(Number(e.target.value))}
+                      className="mt-1 bg-red-50 border-red-200"
+                      placeholder={`${bName}'s share of mortgage`}
+                    />
+                  </div>
+                </div>
+                {Math.abs(calculations.mortgageValidation) > 1 && (
+                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                      <p className="text-yellow-800 font-medium text-sm">Mortgage Share Mismatch</p>
+                    </div>
+                    <p className="text-yellow-700 text-xs mt-1">
+                      Individual shares ({formatCurrency(personAExistingMortgage + personBExistingMortgage)}) 
+                      don't match total ({formatCurrency(totalExistingMortgage)})
+                    </p>
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="personAFlatShare">{aName} Flat Sale Share (%)</Label>
+                    <Input
+                      id="personAFlatShare"
+                      type="number"
+                      step="0.1"
+                      value={personAFlatShare}
+                      onChange={(e) => setPersonAFlatShare(Number(e.target.value))}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="personBFlatShare">{bName} Flat Sale Share (%)</Label>
+                    <Input
+                      id="personBFlatShare"
+                      type="number"
+                      step="0.1"
+                      value={personBFlatShare}
+                      onChange={(e) => setPersonBFlatShare(Number(e.target.value))}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personAColor, 0.08) }}>
+                    <p className="text-sm font-medium" style={{ color: personAColor }}>{aName} Net Proceeds</p>
+                    <p className="text-lg font-bold" style={{ color: personAColor }}>{formatCurrency(calculations.personANetProceeds)}</p>
+                    <p className="text-xs" style={{ color: hexToRgba(personAColor, 0.9) }}>
+                      {formatCurrency(calculations.personAGrossShare)} - {formatCurrency(personAExistingMortgage)}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personBColor, 0.08) }}>
+                    <p className="text-sm font-medium" style={{ color: personBColor }}>{bName} Net Proceeds</p>
+                    <p className="text-lg font-bold" style={{ color: personBColor }}>{formatCurrency(calculations.personBNetProceeds)}</p>
+                    <p className="text-xs" style={{ color: hexToRgba(personBColor, 0.9) }}>
+                      {formatCurrency(calculations.personBGrossShare)} - {formatCurrency(personBExistingMortgage)}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Section: Cash */}
+            <div className="border-t border-gray-200 my-4" />
+            <h2 className="text-sm font-semibold text-gray-700 px-1 flex items-center gap-2">
+              <Users className="h-4 w-4 text-gray-500" /> Individual Cash
+            </h2>
+            <Card className={`${currentStep === 1 ? 'block' : 'hidden'} lg:block`}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5" />
@@ -397,128 +568,8 @@ function App() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Banknote className="h-5 w-5" />
-                  Current Flat Details
-                </CardTitle>
-                <CardDescription>Current flat sale and individual mortgage shares</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="flatSalePrice">Current Flat Sale Price ({currency})</Label>
-                  <Input
-                    id="flatSalePrice"
-                    type="number"
-                    value={flatSalePrice}
-                    onChange={(e) => setFlatSalePrice(Number(e.target.value))}
-                    className="mt-1"
-                    placeholder="Enter expected sale price"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="totalExistingMortgage">Total Existing Flat Mortgage ({currency})</Label>
-                  <Input
-                    id="totalExistingMortgage"
-                    type="number"
-                    value={totalExistingMortgage}
-                    onChange={(e) => setTotalExistingMortgage(Number(e.target.value))}
-                    className="mt-1"
-                    placeholder="Total amount still owed"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="personAExistingMortgage">{aName} Mortgage Share ({currency})</Label>
-                    <Input
-                      id="personAExistingMortgage"
-                      type="number"
-                      value={personAExistingMortgage}
-                      onChange={(e) => setPersonAExistingMortgage(Number(e.target.value))}
-                      className="mt-1 bg-red-50 border-red-200"
-                      placeholder={`${aName}'s share of mortgage`}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="personBExistingMortgage">{bName} Mortgage Share ({currency})</Label>
-                    <Input
-                      id="personBExistingMortgage"
-                      type="number"
-                      value={personBExistingMortgage}
-                      onChange={(e) => setPersonBExistingMortgage(Number(e.target.value))}
-                      className="mt-1 bg-red-50 border-red-200"
-                      placeholder={`${bName}'s share of mortgage`}
-                    />
-                  </div>
-                </div>
-
-                {Math.abs(calculations.mortgageValidation) > 1 && (
-                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                      <p className="text-yellow-800 font-medium text-sm">Mortgage Share Mismatch</p>
-                    </div>
-                    <p className="text-yellow-700 text-xs mt-1">
-                      Individual shares ({formatCurrency(personAExistingMortgage + personBExistingMortgage)}) 
-                      don't match total ({formatCurrency(totalExistingMortgage)})
-                    </p>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="personAFlatShare">{aName} Flat Sale Share (%)</Label>
-                    <Input
-                      id="personAFlatShare"
-                      type="number"
-                      step="0.1"
-                      value={personAFlatShare}
-                      onChange={(e) => setPersonAFlatShare(Number(e.target.value))}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="personBFlatShare">{bName} Flat Sale Share (%)</Label>
-                    <Input
-                      id="personBFlatShare"
-                      type="number"
-                      step="0.1"
-                      value={personBFlatShare}
-                      onChange={(e) => setPersonBFlatShare(Number(e.target.value))}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div
-                    className="p-3 rounded-lg"
-                    style={{ backgroundColor: hexToRgba(personAColor, 0.08) }}
-                  >
-                    <p className="text-sm font-medium" style={{ color: personAColor }}>{aName} Net Proceeds</p>
-                    <p className="text-lg font-bold" style={{ color: personAColor }}>{formatCurrency(calculations.personANetProceeds)}</p>
-                    <p className="text-xs" style={{ color: hexToRgba(personAColor, 0.9) }}>
-                      {formatCurrency(calculations.personAGrossShare)} - {formatCurrency(personAExistingMortgage)}
-                    </p>
-                  </div>
-                  <div
-                    className="p-3 rounded-lg"
-                    style={{ backgroundColor: hexToRgba(personBColor, 0.08) }}
-                  >
-                    <p className="text-sm font-medium" style={{ color: personBColor }}>{bName} Net Proceeds</p>
-                    <p className="text-lg font-bold" style={{ color: personBColor }}>{formatCurrency(calculations.personBNetProceeds)}</p>
-                    <p className="text-xs" style={{ color: hexToRgba(personBColor, 0.9) }}>
-                      {formatCurrency(calculations.personBGrossShare)} - {formatCurrency(personBExistingMortgage)}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
+            {/* Contributions moved into Cash section (step 2) */}
+            <Card className={`${currentStep === 2 ? 'block' : 'hidden'} lg:block`}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <DollarSign className="h-5 w-5" />
@@ -566,7 +617,12 @@ function App() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className={`${currentStep === 4 ? 'block' : 'hidden'} lg:block`}>
+              {/* Section: Other Factors */}
+              <div className="border-t border-gray-200 my-4" />
+              <h2 className="text-sm font-semibold text-gray-700 px-1 flex items-center gap-2">
+                <DollarSign className="h-4 w-4 text-gray-500" /> Other Factors
+              </h2>
               <CardHeader>
                 <CardTitle>Ownership Split</CardTitle>
                 <CardDescription>How will house ownership be split?</CardDescription>
@@ -628,7 +684,7 @@ function App() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className={`${currentStep === 5 ? 'block' : 'hidden'} lg:block`}>
               <CardHeader>
                 <CardTitle>Rental Unit</CardTitle>
                 <CardDescription>Will the house have a rental unit?</CardDescription>
@@ -659,7 +715,7 @@ function App() {
             </Card>
           </div>
 
-          {/* Individual Results Section */}
+          {/* Individual Results Section - non-sticky */}
           <div className="space-y-6">
             <Card className="border" style={{ background: `linear-gradient(90deg, ${hexToRgba(personAColor, 0.06)}, ${hexToRgba(personAColor, 0.12)})`, borderColor: hexToRgba(personAColor, 0.4) }}>
               <CardHeader>
