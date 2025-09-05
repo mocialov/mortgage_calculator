@@ -258,7 +258,7 @@ function App() {
           </div>
         </div>
 
-        {/* Full-width Participants */}
+        {/* Full-width Participants with Cash */}
         <div className="mb-8">
           <Card>
             <CardHeader>
@@ -266,7 +266,7 @@ function App() {
                 <Users className="h-5 w-5" />
                 Participants
               </CardTitle>
-              <CardDescription>Set names and colors for personalization</CardDescription>
+              <CardDescription>Set names, colors, and available cash for each participant</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -315,117 +315,57 @@ function App() {
                   />
                 </div>
               </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="personACash">{aName} Available Cash ({currency})</Label>
+                  <Input
+                    id="personACash"
+                    type="number"
+                    value={personACash}
+                    onChange={(e) => setPersonACash(Number(e.target.value))}
+                    className="mt-1"
+                    placeholder="Enter available cash"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="personBCash">{bName} Available Cash ({currency})</Label>
+                  <Input
+                    id="personBCash"
+                    type="number"
+                    value={personBCash}
+                    onChange={(e) => setPersonBCash(Number(e.target.value))}
+                    className="mt-1"
+                    placeholder="Enter available cash"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personAColor, 0.08) }}>
+                  <p className="text-sm font-medium" style={{ color: personAColor }}>{aName} Available Cash</p>
+                  <p className="text-lg font-bold" style={{ color: personAColor }}>{formatCurrency(personACash)}</p>
+                </div>
+                <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personBColor, 0.08) }}>
+                  <p className="text-sm font-medium" style={{ color: personBColor }}>{bName} Available Cash</p>
+                  <p className="text-lg font-bold" style={{ color: personBColor }}>{formatCurrency(personBCash)}</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
         <div className="border-t border-gray-200 my-6" />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Input Section */}
+          {/* Left Column - Current Situation */}
           <div className="space-y-6">
-            {/* Mobile stepper controls */}
-            <div className="lg:hidden sticky top-0 z-10 -mx-4 px-4 py-3 bg-gradient-to-br from-blue-50/90 to-indigo-100/90 backdrop-blur">
-              <div className="flex items-center justify-between">
-                <button
-                  className="text-sm px-3 py-1 rounded-md bg-white/70 border disabled:opacity-50"
-                  onClick={() => setCurrentStep((s) => Math.max(0, s - 1))}
-                  disabled={currentStep === 0}
-                >
-                  Back
-                </button>
-                <div className="text-sm font-medium">
-                  Step {currentStep + 1} of {inputSteps.length}
-                </div>
-                <button
-                  className="text-sm px-3 py-1 rounded-md bg-blue-600 text-white disabled:opacity-50"
-                  onClick={() => setCurrentStep((s) => Math.min(inputSteps.length - 1, s + 1))}
-                  disabled={currentStep === inputSteps.length - 1}
-                >
-                  Next
-                </button>
-              </div>
-              <div className="mt-2 flex gap-1 justify-center">
-                {inputSteps.map((_, idx) => (
-                  <button
-                    key={idx}
-                    aria-label={`Go to step ${idx + 1}`}
-                    className={`${currentStep === idx ? 'bg-blue-600' : 'bg-blue-300'} h-1.5 w-6 rounded-full`}
-                    onClick={() => setCurrentStep(idx)}
-                  />
-                ))}
-              </div>
-            </div>
-            {/* Section: New House Details */}
-            <h2 className="text-sm font-semibold text-gray-700 px-1 flex items-center gap-2">
-              <Home className="h-4 w-4 text-gray-500" /> New House Details
-            </h2>
-            <Card className={`${currentStep === 2 ? 'block' : 'hidden'} lg:block`}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Home className="h-5 w-5" />
-                  House Details
-                </CardTitle>
-                <CardDescription>Enter the house price and loan details</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="housePrice">House Price ({currency})</Label>
-                  <Input
-                    id="housePrice"
-                    type="number"
-                    value={housePrice}
-                    onChange={(e) => setHousePrice(Number(e.target.value))}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="grantedLoan">Granted Loan ({currency})</Label>
-                  <Input
-                    id="grantedLoan"
-                    type="number"
-                    value={grantedLoan}
-                    onChange={(e) => setGrantedLoan(Number(e.target.value))}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="interestRate">Interest Rate (%)</Label>
-                    <Input
-                      id="interestRate"
-                      type="number"
-                      step="0.01"
-                      value={interestRate}
-                      onChange={(e) => setInterestRate(Number(e.target.value))}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="loanTerm">Loan Term (Years)</Label>
-                    <Input
-                      id="loanTerm"
-                      type="number"
-                      value={loanTerm}
-                      onChange={(e) => setLoanTerm(Number(e.target.value))}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* Section: Current Mortgages (moved above Individual Cash) */}
-            <div className="border-t border-gray-200 my-4" />
-            <h2 className="text-sm font-semibold text-gray-700 px-1 flex items-center gap-2">
-              <Banknote className="h-4 w-4 text-gray-500" /> Current Mortgages
-            </h2>
-            <Card className={`${currentStep === 0 ? 'block' : 'hidden'} lg:block`}>
+            {/* Current Flat & Mortgage */}
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Banknote className="h-5 w-5" />
-                  Current Flat Details
+                  Current Flat & Mortgage
                 </CardTitle>
-                <CardDescription>Current flat sale and individual mortgage shares</CardDescription>
+                <CardDescription>Details about your current property and mortgage</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -510,6 +450,83 @@ function App() {
                     />
                   </div>
                 </div>
+                <div className="p-3 bg-green-50 rounded-lg">
+                  <p className="text-sm text-green-600 font-medium mb-2">Net Proceeds from Flat Sale</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <p className="text-xs" style={{ color: personAColor }}>{aName}</p>
+                      <p className="text-lg font-bold" style={{ color: personAColor }}>{formatCurrency(calculations.personANetProceeds)}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs" style={{ color: personBColor }}>{bName}</p>
+                      <p className="text-lg font-bold" style={{ color: personBColor }}>{formatCurrency(calculations.personBNetProceeds)}</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-green-600 text-center mt-2">
+                    Total: {formatCurrency(calculations.totalNetProceeds)}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - New House & Future Plans */}
+          <div className="space-y-6">
+            {/* New House Details */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Home className="h-5 w-5" />
+                  New House Details
+                </CardTitle>
+                <CardDescription>Enter the house price and loan details</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="housePrice">House Price ({currency})</Label>
+                  <Input
+                    id="housePrice"
+                    type="number"
+                    value={housePrice}
+                    onChange={(e) => setHousePrice(Number(e.target.value))}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="grantedLoan">Granted Loan ({currency})</Label>
+                  <Input
+                    id="grantedLoan"
+                    type="number"
+                    value={grantedLoan}
+                    onChange={(e) => setGrantedLoan(Number(e.target.value))}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="interestRate">Interest Rate (%)</Label>
+                    <Input
+                      id="interestRate"
+                      type="number"
+                      step="0.01"
+                      value={interestRate}
+                      onChange={(e) => setInterestRate(Number(e.target.value))}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="loanTerm">Loan Term (Years)</Label>
+                    <Input
+                      id="loanTerm"
+                      type="number"
+                      value={loanTerm}
+                      onChange={(e) => setLoanTerm(Number(e.target.value))}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personAColor, 0.08) }}>
                     <p className="text-sm font-medium" style={{ color: personAColor }}>{aName} Net Proceeds</p>
@@ -529,53 +546,14 @@ function App() {
               </CardContent>
             </Card>
 
-            {/* Section: Cash */}
-            <div className="border-t border-gray-200 my-4" />
-            <h2 className="text-sm font-semibold text-gray-700 px-1 flex items-center gap-2">
-              <Users className="h-4 w-4 text-gray-500" /> Individual Cash
-            </h2>
-            <Card className={`${currentStep === 1 ? 'block' : 'hidden'} lg:block`}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Individual Cash
-                </CardTitle>
-                <CardDescription>Enter available cash for each person</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="personACash">{aName} Cash ({currency})</Label>
-                    <Input
-                      id="personACash"
-                      type="number"
-                      value={personACash}
-                      onChange={(e) => setPersonACash(Number(e.target.value))}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="personBCash">{bName} Cash ({currency})</Label>
-                    <Input
-                      id="personBCash"
-                      type="number"
-                      value={personBCash}
-                      onChange={(e) => setPersonBCash(Number(e.target.value))}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Contributions moved into Cash section (step 2) */}
-            <Card className={`${currentStep === 2 ? 'block' : 'hidden'} lg:block`}>
+            {/* Contributions */}
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <DollarSign className="h-5 w-5" />
                   Contributions to New Mortgage
                 </CardTitle>
-                <CardDescription>Editable - how much each person contributes</CardDescription>
+                <CardDescription>How much each person contributes to the new house</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -617,14 +595,13 @@ function App() {
               </CardContent>
             </Card>
 
-            <Card className={`${currentStep === 4 ? 'block' : 'hidden'} lg:block`}>
-              {/* Section: Other Factors */}
-              <div className="border-t border-gray-200 my-4" />
-              <h2 className="text-sm font-semibold text-gray-700 px-1 flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-gray-500" /> Other Factors
-              </h2>
+            {/* Ownership Split */}
+            <Card>
               <CardHeader>
-                <CardTitle>Ownership Split</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  House Ownership Split
+                </CardTitle>
                 <CardDescription>How will house ownership be split?</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -684,9 +661,13 @@ function App() {
               </CardContent>
             </Card>
 
-            <Card className={`${currentStep === 5 ? 'block' : 'hidden'} lg:block`}>
+            {/* Rental Unit */}
+            <Card>
               <CardHeader>
-                <CardTitle>Rental Unit</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Home className="h-5 w-5" />
+                  Rental Unit
+                </CardTitle>
                 <CardDescription>Will the house have a rental unit?</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -714,9 +695,13 @@ function App() {
               </CardContent>
             </Card>
           </div>
+        </div>
 
-          {/* Individual Results Section - non-sticky */}
-          <div className="space-y-6">
+        {/* Full-width bottom sections */}
+        <div className="border-t border-gray-200 my-8" />
+        
+        {/* Monthly Payment Results */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <Card className="border" style={{ background: `linear-gradient(90deg, ${hexToRgba(personAColor, 0.06)}, ${hexToRgba(personAColor, 0.12)})`, borderColor: hexToRgba(personAColor, 0.4) }}>
               <CardHeader>
                 <CardTitle style={{ color: personAColor }}>{aName} Monthly Payment</CardTitle>
@@ -774,81 +759,11 @@ function App() {
                 </p>
               </CardContent>
             </Card>
+        </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Loan Need Breakdown</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personAColor, 0.08) }}>
-                    <p className="text-sm font-medium" style={{ color: personAColor }}>{aName} Loan Need</p>
-                    <p className="text-xl font-bold" style={{ color: personAColor }}>{formatCurrency(calculations.personALoanNeed)}</p>
-                    <p className="text-xs" style={{ color: hexToRgba(personAColor, 0.9) }}>
-                      House: {formatCurrency(calculations.personAHouseValue)} - Contribution: {formatCurrency(personAContribution)}
-                    </p>
-                  </div>
-                  <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personBColor, 0.08) }}>
-                    <p className="text-sm font-medium" style={{ color: personBColor }}>{bName} Loan Need</p>
-                    <p className="text-xl font-bold" style={{ color: personBColor }}>{formatCurrency(calculations.personBLoanNeed)}</p>
-                    <p className="text-xs" style={{ color: hexToRgba(personBColor, 0.9) }}>
-                      House: {formatCurrency(calculations.personBHouseValue)} - Contribution: {formatCurrency(personBContribution)}
-                    </p>
-                  </div>
-                </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600 font-medium">Total Loan Needed</p>
-                  <p className="text-2xl font-bold text-gray-800">{formatCurrency(calculations.totalLoanNeeded)}</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Available Cash After Contributions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personAColor, 0.08) }}>
-                    <p className="text-sm font-medium" style={{ color: personAColor }}>{aName} Cash Left</p>
-                    <p className="text-xl font-bold" style={{ color: personAColor }}>{formatCurrency(calculations.personAAvailableCash)}</p>
-                    <p className="text-xs" style={{ color: hexToRgba(personAColor, 0.9) }}>Available - Contributed</p>
-                  </div>
-                  <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personBColor, 0.08) }}>
-                    <p className="text-sm font-medium" style={{ color: personBColor }}>{bName} Cash Left</p>
-                    <p className="text-xl font-bold" style={{ color: personBColor }}>{formatCurrency(calculations.personBAvailableCash)}</p>
-                    <p className="text-xs" style={{ color: hexToRgba(personBColor, 0.9) }}>Available - Contributed</p>
-                  </div>
-                </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600 font-medium">Total Cash Kept</p>
-                  <p className="text-2xl font-bold text-gray-800">{formatCurrency(calculations.totalAvailableCash)}</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>First Month Breakdown (IPMT)</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p className="font-medium" style={{ color: personAColor }}>{aName}</p>
-                    <p>Interest: {formatCurrency(calculations.personAFirstInterest)}</p>
-                    <p>Principal: {formatCurrency(calculations.personAMonthlyPayment - calculations.personAFirstInterest)}</p>
-                  </div>
-                  <div>
-                    <p className="font-medium" style={{ color: personBColor }}>{bName}</p>
-                    <p>Interest: {formatCurrency(calculations.personBFirstInterest)}</p>
-                    <p>Principal: {formatCurrency(calculations.personBMonthlyPayment - calculations.personBFirstInterest)}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Summary Section */}
+        {/* Bottom section with three columns */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Financial Summary */}
           <div className="space-y-6">
             <Card>
               <CardHeader>
@@ -892,19 +807,37 @@ function App() {
                     <span className="font-semibold">{formatCurrency(calculations.totalLoanNeeded)}</span>
                   </div>
                 </div>
-
-                {calculations.totalLoanNeeded > grantedLoan && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-red-800 font-medium">⚠️ Warning</p>
-                    <p className="text-red-700 text-sm">
-                      You need {formatCurrency(calculations.totalLoanNeeded)} but only have {formatCurrency(grantedLoan)} approved. 
-                      You need an additional {formatCurrency(calculations.totalLoanNeeded - grantedLoan)} in cash or a larger loan.
+            <Card>
+              <CardHeader>
+                <CardTitle>Available Cash After Contributions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personAColor, 0.08) }}>
+                    <p className="text-sm font-medium" style={{ color: personAColor }}>{aName} Cash Left</p>
+                    <p className="text-xl font-bold" style={{ color: personAColor }}>{formatCurrency(calculations.personAAvailableCash)}</p>
+                    <p className="text-xs" style={{ color: hexToRgba(personAColor, 0.9) }}>
+                      Available - Contributed
                     </p>
                   </div>
-                )}
+                  <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personBColor, 0.08) }}>
+                    <p className="text-sm font-medium" style={{ color: personBColor }}>{bName} Cash Left</p>
+                    <p className="text-xl font-bold" style={{ color: personBColor }}>{formatCurrency(calculations.personBAvailableCash)}</p>
+                    <p className="text-xs" style={{ color: hexToRgba(personBColor, 0.9) }}>
+                      Available - Contributed
+                    </p>
+                  </div>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-600 font-medium">Total Cash Kept</p>
+                  <p className="text-2xl font-bold text-gray-800">{formatCurrency(calculations.totalAvailableCash)}</p>
+                </div>
               </CardContent>
             </Card>
+          </div>
 
+          {/* Calculation Logic */}
+          <div className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Calculation Logic</CardTitle>
@@ -938,11 +871,60 @@ function App() {
                 </div>
               </CardContent>
             </Card>
-
+                <div className="grid grid-cols-2 gap-4">
             <Card>
               <CardHeader>
-                <CardTitle>Loan Details</CardTitle>
+                <CardTitle>Loan Need Breakdown</CardTitle>
               </CardHeader>
+              <CardContent className="space-y-4">
+                  <div className="p-3 rounded-lg" style={{ backgroundColor: hexToRgba(personAColor, 0.08) }}>
+                    <p className="text-sm font-medium" style={{ color: personAColor }}>{aName} Cash Left</p>
+                    <p className="text-sm font-medium" style={{ color: personAColor }}>{aName} Loan Need</p>
+                    <p className="text-xl font-bold" style={{ color: personAColor }}>{formatCurrency(calculations.personALoanNeed)}</p>
+                  </div>
+                      House: {formatCurrency(calculations.personAHouseValue)} - Contribution: {formatCurrency(personAContribution)}
+                    <p className="text-sm font-medium" style={{ color: personBColor }}>{bName} Cash Left</p>
+                    <p className="text-xl font-bold" style={{ color: personBColor }}>{formatCurrency(calculations.personBAvailableCash)}</p>
+                    <p className="text-xs" style={{ color: hexToRgba(personBColor, 0.9) }}>Available - Contributed</p>
+                    <p className="text-sm font-medium" style={{ color: personBColor }}>{bName} Loan Need</p>
+                    <p className="text-xl font-bold" style={{ color: personBColor }}>{formatCurrency(calculations.personBLoanNeed)}</p>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                      House: {formatCurrency(calculations.personBHouseValue)} - Contribution: {formatCurrency(personBContribution)}
+                  <p className="text-2xl font-bold text-gray-800">{formatCurrency(calculations.totalAvailableCash)}</p>
+                </div>
+              </CardContent>
+            </Card>
+                  <p className="text-sm text-gray-600 font-medium">Total Loan Needed</p>
+                  <p className="text-2xl font-bold text-gray-800">{formatCurrency(calculations.totalLoanNeeded)}</p>
+              <CardHeader>
+                <CardTitle>First Month Breakdown (IPMT)</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="font-medium" style={{ color: personAColor }}>{aName}</p>
+                    <p>Interest: {formatCurrency(calculations.personAFirstInterest)}</p>
+                    <p>Principal: {formatCurrency(calculations.personAMonthlyPayment - calculations.personAFirstInterest)}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium" style={{ color: personBColor }}>{bName}</p>
+                    <p>Interest: {formatCurrency(calculations.personBFirstInterest)}</p>
+                    <p>Principal: {formatCurrency(calculations.personBMonthlyPayment - calculations.personBFirstInterest)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Summary Section */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Financial Summary</CardTitle>
+          {/* Loan Details */}
+              <CardContent className="space-y-4">
+                      You need {formatCurrency(calculations.totalLoanNeeded)} but only have {formatCurrency(grantedLoan)} approved. 
+              <CardContent className="space-y-4">
               <CardContent className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Interest Rate:</span>
@@ -971,3 +953,14 @@ function App() {
 
 export default App
 
+                {calculations.totalLoanNeeded > grantedLoan && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-800 font-medium">⚠️ Warning</p>
+                    <p className="text-red-700 text-sm">
+                      You need {formatCurrency(calculations.totalLoanNeeded)} but only have {formatCurrency(grantedLoan)} approved. 
+                      You need an additional {formatCurrency(calculations.totalLoanNeeded - grantedLoan)} in cash or a larger loan.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
