@@ -6,31 +6,62 @@ import { Label } from '@/components/ui/label.jsx'
 import { Switch } from '@/components/ui/switch.jsx'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.jsx'
 import { Calculator, Home, DollarSign, TrendingUp, Users, Banknote, AlertTriangle } from 'lucide-react'
+import { useLocalStorageState } from '@/hooks/useLocalStorage.js'
 import './App.css'
 
 
 function App() {
-  const [housePrice, setHousePrice] = useState(1000000)
-  const [personAName, setPersonAName] = useState('Person A')
-  const [personBName, setPersonBName] = useState('Person B')
-  const [personAColor, setPersonAColor] = useState('#2563eb') // default blue-600
-  const [personBColor, setPersonBColor] = useState('#db2777') // default pink-600
-  const [personACash, setPersonACash] = useState(1000000)
-  const [personBCash, setPersonBCash] = useState(1000000)
-  const [flatSalePrice, setFlatSalePrice] = useState(0)
-  const [personAExistingMortgage, setPersonAExistingMortgage] = useState(0)
-  const [personBExistingMortgage, setPersonBExistingMortgage] = useState(0)
-  const [personAFlatShare, setPersonAFlatShare] = useState(50)
-  const [personBFlatShare, setPersonBFlatShare] = useState(50)
-  const [personAContribution, setPersonAContribution] = useState(0)
-  const [personBContribution, setPersonBContribution] = useState(0)
-  const [personAHouseShare, setPersonAHouseShare] = useState(50)
-  const [personBHouseShare, setPersonBHouseShare] = useState(50)
-  const [grantedLoan, setGrantedLoan] = useState(5000000)
-  const [interestRate, setInterestRate] = useState(5.13)
-  const [loanTerm, setLoanTerm] = useState(30)
-  const [hasRentalUnit, setHasRentalUnit] = useState(false)
-  const [rentalIncome, setRentalIncome] = useState(0)
+  // All form data with persistence
+  const {
+    housePrice, setHousePrice,
+    personAName, setPersonAName,
+    personBName, setPersonBName,
+    personAColor, setPersonAColor,
+    personBColor, setPersonBColor,
+    personACash, setPersonACash,
+    personBCash, setPersonBCash,
+    flatSalePrice, setFlatSalePrice,
+    personAExistingMortgage, setPersonAExistingMortgage,
+    personBExistingMortgage, setPersonBExistingMortgage,
+    personAFlatShare, setPersonAFlatShare,
+    personBFlatShare, setPersonBFlatShare,
+    personAContribution, setPersonAContribution,
+    personBContribution, setPersonBContribution,
+    personAHouseShare, setPersonAHouseShare,
+    personBHouseShare, setPersonBHouseShare,
+    grantedLoan, setGrantedLoan,
+    interestRate, setInterestRate,
+    loanTerm, setLoanTerm,
+    hasRentalUnit, setHasRentalUnit,
+    rentalIncome, setRentalIncome,
+    currency, setCurrency,
+    currentStep, setCurrentStep
+  } = useLocalStorageState({
+    housePrice: 1000000,
+    personAName: 'Person A',
+    personBName: 'Person B',
+    personAColor: '#2563eb', // default blue-600
+    personBColor: '#db2777', // default pink-600
+    personACash: 1000000,
+    personBCash: 1000000,
+    flatSalePrice: 0,
+    personAExistingMortgage: 0,
+    personBExistingMortgage: 0,
+    personAFlatShare: 50,
+    personBFlatShare: 50,
+    personAContribution: 0,
+    personBContribution: 0,
+    personAHouseShare: 50,
+    personBHouseShare: 50,
+    grantedLoan: 5000000,
+    interestRate: 5.13,
+    loanTerm: 30,
+    hasRentalUnit: false,
+    rentalIncome: 0,
+    currency: 'NOK',
+    currentStep: 0
+  })
+
   // Mobile stepper (only affects small screens)
   const inputSteps = [
     'Current Flat Details',
@@ -40,10 +71,6 @@ function App() {
     'Ownership Split',
     'Rental Unit'
   ]
-  const [currentStep, setCurrentStep] = useState(0)
-
-  // Currency setting
-  const [currency, setCurrency] = useState('NOK')
 
   const [calculations, setCalculations] = useState({
     personAGrossShare: 0,
