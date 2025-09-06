@@ -18,7 +18,6 @@ function App() {
   const [personACash, setPersonACash] = useState(1000000)
   const [personBCash, setPersonBCash] = useState(1000000)
   const [flatSalePrice, setFlatSalePrice] = useState(0)
-  const [totalExistingMortgage, setTotalExistingMortgage] = useState(0)
   const [personAExistingMortgage, setPersonAExistingMortgage] = useState(0)
   const [personBExistingMortgage, setPersonBExistingMortgage] = useState(0)
   const [personAFlatShare, setPersonAFlatShare] = useState(50)
@@ -73,7 +72,8 @@ function App() {
     personAFirstInterest: 0,
     personBFirstInterest: 0,
     mortgageValidation: 0,
-    houseShareValidation: 0
+    houseShareValidation: 0,
+    totalExistingMortgage: 0
   })
 
   // PMT function that matches Excel's PMT
@@ -165,8 +165,11 @@ function App() {
     const personAFirstInterest = personALoanNeed > 0 ? calculateIPMT(monthlyInterestRate, personALoanNeed) : 0
     const personBFirstInterest = personBLoanNeed > 0 ? calculateIPMT(monthlyInterestRate, personBLoanNeed) : 0
 
+    // Calculate total existing mortgage from individual shares
+    const totalExistingMortgage = personAExistingMortgage + personBExistingMortgage
+
     // Validations
-    const mortgageValidation = totalExistingMortgage - (personAExistingMortgage + personBExistingMortgage)
+    const mortgageValidation = 0 // No longer needed since we calculate total from shares
     const houseShareValidation = (personAHouseShare + personBHouseShare) - 100
 
     setCalculations({
@@ -196,7 +199,8 @@ function App() {
       personAFirstInterest,
       personBFirstInterest,
       mortgageValidation,
-      houseShareValidation
+      houseShareValidation,
+      totalExistingMortgage
     })
 
     // Auto-update contribution fields to always match Max available
@@ -206,7 +210,7 @@ function App() {
     if (personBContribution !== personBMaxContribution) {
       setPersonBContribution(personBMaxContribution)
     }
-  }, [housePrice, personACash, personBCash, flatSalePrice, totalExistingMortgage, personAExistingMortgage, personBExistingMortgage, personAFlatShare, personBFlatShare, personAContribution, personBContribution, personAHouseShare, personBHouseShare, grantedLoan, interestRate, loanTerm, hasRentalUnit, rentalIncome])
+  }, [housePrice, personACash, personBCash, flatSalePrice, personAExistingMortgage, personBExistingMortgage, personAFlatShare, personBFlatShare, personAContribution, personBContribution, personAHouseShare, personBHouseShare, grantedLoan, interestRate, loanTerm, hasRentalUnit, rentalIncome])
 
   const formatCurrency = (amount) => {
     const browserLocale = typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en-US'
@@ -322,7 +326,7 @@ function App() {
         <div className="border-t border-gray-200 my-6" />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Input Section */}
+          {/* Left Column - Input Sections */}
           <div className="space-y-6">
             {/* Mobile stepper controls */}
             <div className="lg:hidden sticky top-0 z-10 -mx-4 px-4 py-3 bg-gradient-to-br from-blue-50/90 to-indigo-100/90 backdrop-blur">
@@ -440,17 +444,6 @@ function App() {
                     placeholder="Enter expected sale price"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="totalExistingMortgage">Total Existing Flat Mortgage ({currency})</Label>
-                  <Input
-                    id="totalExistingMortgage"
-                    type="number"
-                    value={totalExistingMortgage}
-                    onChange={(e) => setTotalExistingMortgage(Number(e.target.value))}
-                    className="mt-1"
-                    placeholder="Total amount still owed"
-                  />
-                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="personAExistingMortgage">{aName} Mortgage Share ({currency})</Label>
@@ -475,18 +468,6 @@ function App() {
                     />
                   </div>
                 </div>
-                {Math.abs(calculations.mortgageValidation) > 1 && (
-                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                      <p className="text-yellow-800 font-medium text-sm">Mortgage Share Mismatch</p>
-                    </div>
-                    <p className="text-yellow-700 text-xs mt-1">
-                      Individual shares ({formatCurrency(personAExistingMortgage + personBExistingMortgage)}) 
-                      don't match total ({formatCurrency(totalExistingMortgage)})
-                    </p>
-                  </div>
-                )}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="personAFlatShare">{aName} Flat Sale Share (%)</Label>
@@ -716,7 +697,7 @@ function App() {
             </Card>
           </div>
 
-          {/* Individual Results Section - non-sticky */}
+          {/* Right Column - Results & Calculations */}
           <div className="space-y-6">
             <Card className="border" style={{ background: `linear-gradient(90deg, ${hexToRgba(personAColor, 0.06)}, ${hexToRgba(personAColor, 0.12)})`, borderColor: hexToRgba(personAColor, 0.4) }}>
               <CardHeader>
@@ -849,7 +830,10 @@ function App() {
             </Card>
           </div>
 
-          {/* Summary Section */}
+        </div>
+
+        {/* Bottom Section - Spanning Both Columns */}
+        <div className="border-t border-gray-300 my-8 pt-8">
           <div className="space-y-6">
             <Card>
               <CardHeader>
@@ -878,7 +862,7 @@ function App() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Total Existing Mortgage:</span>
-                    <span className="font-semibold">{formatCurrency(totalExistingMortgage)}</span>
+                    <span className="font-semibold">{formatCurrency(calculations.totalExistingMortgage)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Net Proceeds from Flat:</span>
