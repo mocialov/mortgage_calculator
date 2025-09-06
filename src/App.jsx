@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calculator, Home, DollarSign, TrendingUp, Users, Banknote, AlertTriangle } from 'lucide-react'
 import './App.css'
 
+
 function App() {
   const [housePrice, setHousePrice] = useState(1000000)
   const [personAName, setPersonAName] = useState('Person A')
