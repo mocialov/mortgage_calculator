@@ -129,55 +129,72 @@ function App() {
   }
 
   useEffect(() => {
+    // Convert empty strings to 0 for calculations
+    const housePriceNum = housePrice === '' ? 0 : Number(housePrice)
+    const personACashNum = personACash === '' ? 0 : Number(personACash)
+    const personBCashNum = personBCash === '' ? 0 : Number(personBCash)
+    const flatSalePriceNum = flatSalePrice === '' ? 0 : Number(flatSalePrice)
+    const personAExistingMortgageNum = personAExistingMortgage === '' ? 0 : Number(personAExistingMortgage)
+    const personBExistingMortgageNum = personBExistingMortgage === '' ? 0 : Number(personBExistingMortgage)
+    const personAFlatShareNum = personAFlatShare === '' ? 0 : Number(personAFlatShare)
+    const personBFlatShareNum = personBFlatShare === '' ? 0 : Number(personBFlatShare)
+    const personAContributionNum = personAContribution === '' ? 0 : Number(personAContribution)
+    const personBContributionNum = personBContribution === '' ? 0 : Number(personBContribution)
+    const personAHouseShareNum = personAHouseShare === '' ? 0 : Number(personAHouseShare)
+    const personBHouseShareNum = personBHouseShare === '' ? 0 : Number(personBHouseShare)
+    const interestRateNum = interestRate === '' ? 0 : Number(interestRate)
+    const loanTermNum = loanTerm === '' ? 0 : Number(loanTerm)
+    const rentalIncomeNum = rentalIncome === '' ? 0 : Number(rentalIncome)
+
     // Normalize flat share percentages
-    const totalFlatShare = personAFlatShare + personBFlatShare
-    const normalizedPersonAShare = totalFlatShare > 0 ? personAFlatShare / totalFlatShare : 0.5
-    const normalizedPersonBShare = totalFlatShare > 0 ? personBFlatShare / totalFlatShare : 0.5
+    const totalFlatShare = personAFlatShareNum + personBFlatShareNum
+    const normalizedPersonAShare = totalFlatShare > 0 ? personAFlatShareNum / totalFlatShare : 0.5
+    const normalizedPersonBShare = totalFlatShare > 0 ? personBFlatShareNum / totalFlatShare : 0.5
 
     // Calculate gross shares of flat sale
-    const personAGrossShare = flatSalePrice * normalizedPersonAShare
-    const personBGrossShare = flatSalePrice * normalizedPersonBShare
-    
+    const personAGrossShare = flatSalePriceNum * normalizedPersonAShare
+    const personBGrossShare = flatSalePriceNum * normalizedPersonBShare
+
     // Calculate net proceeds after paying individual mortgage shares
-    const personANetProceeds = personAGrossShare - personAExistingMortgage
-    const personBNetProceeds = personBGrossShare - personBExistingMortgage
+    const personANetProceeds = personAGrossShare - personAExistingMortgageNum
+    const personBNetProceeds = personBGrossShare - personBExistingMortgageNum
     const totalNetProceeds = personANetProceeds + personBNetProceeds
-    
+
     // Calculate maximum possible contributions (cash + net flat proceeds)
-    const personAMaxContribution = personACash + personANetProceeds
-    const personBMaxContribution = personBCash + personBNetProceeds
-    
+    const personAMaxContribution = personACashNum + personANetProceeds
+    const personBMaxContribution = personBCashNum + personBNetProceeds
+
     // Set default contributions if not manually set
-    const actualPersonAContribution = personAContribution || personAMaxContribution
-    const actualPersonBContribution = personBContribution || personBMaxContribution
-    
+    const actualPersonAContribution = personAContributionNum || personAMaxContribution
+    const actualPersonBContribution = personBContributionNum || personBMaxContribution
+
     const totalContribution = actualPersonAContribution + actualPersonBContribution
-    
+
     // Normalize house share percentages
-    const totalHouseShare = personAHouseShare + personBHouseShare
-    const normalizedPersonAHouseShare = totalHouseShare > 0 ? personAHouseShare / totalHouseShare : 0.5
-    const normalizedPersonBHouseShare = totalHouseShare > 0 ? personBHouseShare / totalHouseShare : 0.5
+    const totalHouseShare = personAHouseShareNum + personBHouseShareNum
+    const normalizedPersonAHouseShare = totalHouseShare > 0 ? personAHouseShareNum / totalHouseShare : 0.5
+    const normalizedPersonBHouseShare = totalHouseShare > 0 ? personBHouseShareNum / totalHouseShare : 0.5
 
     // Calculate individual house values based on ownership split
-    const personAHouseValue = housePrice * normalizedPersonAHouseShare
-    const personBHouseValue = housePrice * normalizedPersonBHouseShare
-    
+    const personAHouseValue = housePriceNum * normalizedPersonAHouseShare
+    const personBHouseValue = housePriceNum * normalizedPersonBHouseShare
+
     // CORRECT LOGIC: Individual loan need = House share - Individual contribution
     const personALoanNeed = Math.max(0, personAHouseValue - actualPersonAContribution)
     const personBLoanNeed = Math.max(0, personBHouseValue - actualPersonBContribution)
     const totalLoanNeeded = personALoanNeed + personBLoanNeed
-    
+
     // Calculate monthly payments using PMT formula
-    const monthlyInterestRate = interestRate / 100 / 12
-    const numberOfPayments = loanTerm * 12
-    
+    const monthlyInterestRate = interestRateNum / 100 / 12
+    const numberOfPayments = loanTermNum * 12
+
     const personAMonthlyPayment = personALoanNeed > 0 ? calculatePMT(monthlyInterestRate, numberOfPayments, personALoanNeed) : 0
     const personBMonthlyPayment = personBLoanNeed > 0 ? calculatePMT(monthlyInterestRate, numberOfPayments, personBLoanNeed) : 0
-    
+
     // Calculate rental income shares
-    const personARentalShare = hasRentalUnit ? rentalIncome * normalizedPersonAShare : 0
-    const personBRentalShare = hasRentalUnit ? rentalIncome * normalizedPersonBShare : 0
-    
+    const personARentalShare = hasRentalUnit ? rentalIncomeNum * normalizedPersonAShare : 0
+    const personBRentalShare = hasRentalUnit ? rentalIncomeNum * normalizedPersonBShare : 0
+
     // Calculate final payments after rental income
     const personAFinalPayment = personAMonthlyPayment - personARentalShare
     const personBFinalPayment = personBMonthlyPayment - personBRentalShare
@@ -193,11 +210,11 @@ function App() {
     const personBFirstInterest = personBLoanNeed > 0 ? calculateIPMT(monthlyInterestRate, personBLoanNeed) : 0
 
     // Calculate total existing mortgage from individual shares
-    const totalExistingMortgage = personAExistingMortgage + personBExistingMortgage
+    const totalExistingMortgage = personAExistingMortgageNum + personBExistingMortgageNum
 
     // Validations
     const mortgageValidation = 0 // No longer needed since we calculate total from shares
-    const houseShareValidation = (personAHouseShare + personBHouseShare) - 100
+    const houseShareValidation = (personAHouseShareNum + personBHouseShareNum) - 100
 
     setCalculations({
       personAGrossShare,
@@ -231,10 +248,10 @@ function App() {
     })
 
     // Auto-update contribution fields to always match Max available
-    if (personAContribution !== personAMaxContribution) {
+    if (personAContributionNum !== personAMaxContribution) {
       setPersonAContribution(personAMaxContribution)
     }
-    if (personBContribution !== personBMaxContribution) {
+    if (personBContributionNum !== personBMaxContribution) {
       setPersonBContribution(personBMaxContribution)
     }
   }, [housePrice, personACash, personBCash, flatSalePrice, personAExistingMortgage, personBExistingMortgage, personAFlatShare, personBFlatShare, personAContribution, personBContribution, personAHouseShare, personBHouseShare, grantedLoan, interestRate, loanTerm, hasRentalUnit, rentalIncome])
@@ -406,7 +423,7 @@ function App() {
                     id="housePrice"
                     type="number"
                     value={housePrice}
-                    onChange={(e) => setHousePrice(Number(e.target.value))}
+                    onChange={(e) => setHousePrice(e.target.value === '' ? '' : Number(e.target.value))}
                     className="mt-1"
                   />
                 </div>
@@ -416,7 +433,7 @@ function App() {
                     id="grantedLoan"
                     type="number"
                     value={grantedLoan}
-                    onChange={(e) => setGrantedLoan(Number(e.target.value))}
+                    onChange={(e) => setGrantedLoan(e.target.value === '' ? '' : Number(e.target.value))}
                     className="mt-1"
                   />
                 </div>
@@ -428,7 +445,7 @@ function App() {
                       type="number"
                       step="0.01"
                       value={interestRate}
-                      onChange={(e) => setInterestRate(Number(e.target.value))}
+                      onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
                       className="mt-1"
                     />
                   </div>
@@ -438,7 +455,7 @@ function App() {
                       id="loanTerm"
                       type="number"
                       value={loanTerm}
-                      onChange={(e) => setLoanTerm(Number(e.target.value))}
+                      onChange={(e) => setLoanTerm(e.target.value === '' ? '' : Number(e.target.value))}
                       className="mt-1"
                     />
                   </div>
@@ -466,7 +483,7 @@ function App() {
                     id="flatSalePrice"
                     type="number"
                     value={flatSalePrice}
-                    onChange={(e) => setFlatSalePrice(Number(e.target.value))}
+                    onChange={(e) => setFlatSalePrice(e.target.value === '' ? '' : Number(e.target.value))}
                     className="mt-1"
                     placeholder="Enter expected sale price"
                   />
@@ -478,7 +495,7 @@ function App() {
                       id="personAExistingMortgage"
                       type="number"
                       value={personAExistingMortgage}
-                      onChange={(e) => setPersonAExistingMortgage(Number(e.target.value))}
+                      onChange={(e) => setPersonAExistingMortgage(e.target.value === '' ? '' : Number(e.target.value))}
                       className="mt-1 bg-red-50 border-red-200"
                       placeholder={`${aName}'s share of mortgage`}
                     />
@@ -489,7 +506,7 @@ function App() {
                       id="personBExistingMortgage"
                       type="number"
                       value={personBExistingMortgage}
-                      onChange={(e) => setPersonBExistingMortgage(Number(e.target.value))}
+                      onChange={(e) => setPersonBExistingMortgage(e.target.value === '' ? '' : Number(e.target.value))}
                       className="mt-1 bg-red-50 border-red-200"
                       placeholder={`${bName}'s share of mortgage`}
                     />
@@ -503,7 +520,7 @@ function App() {
                       type="number"
                       step="0.1"
                       value={personAFlatShare}
-                      onChange={(e) => setPersonAFlatShare(Number(e.target.value))}
+                      onChange={(e) => setPersonAFlatShare(e.target.value === '' ? '' : Number(e.target.value))}
                       className="mt-1"
                     />
                   </div>
@@ -514,7 +531,7 @@ function App() {
                       type="number"
                       step="0.1"
                       value={personBFlatShare}
-                      onChange={(e) => setPersonBFlatShare(Number(e.target.value))}
+                      onChange={(e) => setPersonBFlatShare(e.target.value === '' ? '' : Number(e.target.value))}
                       className="mt-1"
                     />
                   </div>
@@ -559,7 +576,7 @@ function App() {
                       id="personACash"
                       type="number"
                       value={personACash}
-                      onChange={(e) => setPersonACash(Number(e.target.value))}
+                      onChange={(e) => setPersonACash(e.target.value === '' ? '' : Number(e.target.value))}
                       className="mt-1"
                     />
                   </div>
@@ -569,7 +586,7 @@ function App() {
                       id="personBCash"
                       type="number"
                       value={personBCash}
-                      onChange={(e) => setPersonBCash(Number(e.target.value))}
+                      onChange={(e) => setPersonBCash(e.target.value === '' ? '' : Number(e.target.value))}
                       className="mt-1"
                     />
                   </div>
@@ -593,7 +610,7 @@ function App() {
                     id="personAContribution"
                     type="number"
                     value={personAContribution}
-                    onChange={(e) => setPersonAContribution(Number(e.target.value))}
+                    onChange={(e) => setPersonAContribution(e.target.value === '' ? '' : Number(e.target.value))}
                     className="mt-1 bg-orange-50 border-orange-200"
                     placeholder={`Max: ${formatCurrency(calculations.personAMaxContribution)}`}
                   />
@@ -609,7 +626,7 @@ function App() {
                     id="personBContribution"
                     type="number"
                     value={personBContribution}
-                    onChange={(e) => setPersonBContribution(Number(e.target.value))}
+                    onChange={(e) => setPersonBContribution(e.target.value === '' ? '' : Number(e.target.value))}
                     className="mt-1 bg-orange-50 border-orange-200"
                     placeholder={`Max: ${formatCurrency(calculations.personBMaxContribution)}`}
                   />
@@ -645,7 +662,7 @@ function App() {
                       type="number"
                       step="0.1"
                       value={personAHouseShare}
-                      onChange={(e) => setPersonAHouseShare(Number(e.target.value))}
+                      onChange={(e) => setPersonAHouseShare(e.target.value === '' ? '' : Number(e.target.value))}
                       className="mt-1 bg-blue-50 border-blue-200"
                     />
                   </div>
@@ -656,7 +673,7 @@ function App() {
                       type="number"
                       step="0.1"
                       value={personBHouseShare}
-                      onChange={(e) => setPersonBHouseShare(Number(e.target.value))}
+                      onChange={(e) => setPersonBHouseShare(e.target.value === '' ? '' : Number(e.target.value))}
                       className="mt-1 bg-blue-50 border-blue-200"
                     />
                   </div>
@@ -714,7 +731,7 @@ function App() {
                       id="rentalIncome"
                       type="number"
                       value={rentalIncome}
-                      onChange={(e) => setRentalIncome(Number(e.target.value))}
+                      onChange={(e) => setRentalIncome(e.target.value === '' ? '' : Number(e.target.value))}
                       className="mt-1"
                       placeholder="Enter monthly rental income"
                     />
