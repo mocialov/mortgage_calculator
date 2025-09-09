@@ -14,6 +14,7 @@ function App() {
   // All form data with persistence
   const {
     housePrice, setHousePrice,
+  finnkode, setFinnkode,
     personAName, setPersonAName,
     personBName, setPersonBName,
     personAColor, setPersonAColor,
@@ -38,6 +39,7 @@ function App() {
     currentStep, setCurrentStep
   } = useLocalStorageState({
     housePrice: 1000000,
+  finnkode: '',
     personAName: 'Person A',
     personBName: 'Person B',
     personAColor: '#2563eb', // default blue-600
@@ -426,6 +428,36 @@ function App() {
                     onChange={(e) => setHousePrice(e.target.value === '' ? '' : Number(e.target.value))}
                     className="mt-1"
                   />
+                </div>
+                <div>
+                  <Label htmlFor="finnkode">Finnkode</Label>
+                  <div className="mt-1 flex gap-2">
+                    <Input
+                      id="finnkode"
+                      type="text"
+                      value={finnkode}
+                      onChange={(e) => setFinnkode(e.target.value)}
+                      placeholder="Enter Finn code"
+                      className="flex-1"
+                    />
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      disabled={!finnkode}
+                      onClick={() => {
+                        if (!finnkode) return
+                        const url = `https://pyfinn-git-vercelready-mocialovs-projects.vercel.app/?finnkode=${encodeURIComponent(finnkode)}`
+                        window.open(url, '_blank', 'noopener,noreferrer')
+                      }}
+                    >
+                      Send
+                    </Button>
+                  </div>
+                  {finnkode && (
+                    <p className="text-[11px] text-gray-500 mt-1 break-all">
+                      URL: https://pyfinn-git-vercelready-mocialovs-projects.vercel.app/?finnkode={encodeURIComponent(finnkode)}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="grantedLoan">Granted Loan ({currency})</Label>
