@@ -4,6 +4,8 @@ node_modules/
 .pnp.cjs
 .pnp.loader.mjs
 
+.continue/
+
 # Vite / build output
 dist/
 .vite/

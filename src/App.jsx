@@ -5,12 +5,17 @@ import { Input } from '@/components/ui/input.jsx'
 import { Label } from '@/components/ui/label.jsx'
 import { Switch } from '@/components/ui/switch.jsx'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.jsx'
-import { Calculator, Home, DollarSign, TrendingUp, Users, Banknote, AlertTriangle } from 'lucide-react'
+import { Calculator, Home, DollarSign, TrendingUp, Users, Banknote, AlertTriangle, FileText, Loader2 } from 'lucide-react'
 import { useLocalStorageState } from '@/hooks/useLocalStorage.js'
 import './App.css'
 
 
 function App() {
+  // Property Status Report state
+  const [propertyUrl, setPropertyUrl] = useState('')
+  const [propertyResponse, setPropertyResponse] = useState('')
+  const [isPropertyLoading, setIsPropertyLoading] = useState(false)
+
   // All form data with persistence
   const {
     housePrice, setHousePrice,
@@ -369,6 +374,103 @@ function App() {
             </CardContent>
           </Card>
         </div>
+        
+        {/* Property Status Report */}
+        <div className="mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Property Status Report
+              </CardTitle>
+              <CardDescription>Enter a URL to get property status information</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="propertyUrl">Property URL</Label>
+                <div className="mt-1 flex gap-2">
+                  <Input
+                    id="propertyUrl"
+                    type="text"
+                    value={propertyUrl}
+                    onChange={(e) => setPropertyUrl(e.target.value)}
+                    placeholder="Enter URL parameter (e.g., 'search?q=property')"
+                    className="flex-1"
+                    disabled={isPropertyLoading}
+                  />
+                  <Button
+                    type="button"
+                    variant="default"
+                    disabled={!propertyUrl || isPropertyLoading}
+                    onClick={async () => {
+                      if (!propertyUrl) return
+                      
+                      setIsPropertyLoading(true)
+                      setPropertyResponse('')
+                      
+                      try {
+                        const fullUrl = `https://www.google.com/${propertyUrl}`
+                        
+                        // Use a CORS proxy to fetch the Google URL
+                        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(fullUrl)}`
+                        
+                        const response = await fetch(proxyUrl, {
+                          method: 'GET'
+                        })
+                        
+                        if (response.ok) {
+                          const data = await response.json()
+                          setPropertyResponse(data.contents || 'Response received but content was empty')
+                        } else {
+                          setPropertyResponse(`Error: ${response.status} ${response.statusText}`)
+                        }
+                      } catch (error) {
+                        console.error('Property status request error:', error)
+                        setPropertyResponse(`Network Error: ${error.message}\n\nNote: Due to CORS restrictions, this feature may not work with all URLs. The full URL would be: https://www.google.com/${propertyUrl}`)
+                      } finally {
+                        setIsPropertyLoading(false)
+                      }
+                    }}
+                  >
+                    {isPropertyLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Loading...
+                      </>
+                    ) : (
+                      'Send'
+                    )}
+                  </Button>
+                </div>
+                {propertyUrl && (
+                  <p className="text-[11px] text-gray-500 mt-1 break-all">
+                    Full URL: https://www.google.com/{propertyUrl}
+                  </p>
+                )}
+              </div>
+              
+              {/* Response Display Area */}
+              {(propertyResponse || isPropertyLoading) && (
+                <div className="mt-4">
+                  <Label>Response</Label>
+                  <div className="mt-1 p-3 bg-gray-50 border rounded-md min-h-[100px] max-h-[400px] overflow-auto">
+                    {isPropertyLoading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                        <span className="ml-2 text-gray-500">Fetching property status...</span>
+                      </div>
+                    ) : (
+                      <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono">
+                        {propertyResponse}
+                      </pre>
+                    )}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+        
         <div className="border-t border-gray-200 my-6" />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -420,16 +522,6 @@ function App() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="housePrice">House Price ({currency})</Label>
-                  <Input
-                    id="housePrice"
-                    type="number"
-                    value={housePrice}
-                    onChange={(e) => setHousePrice(e.target.value === '' ? '' : Number(e.target.value))}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
                   <Label htmlFor="finnkode">Finnkode</Label>
                   <div className="mt-1 flex gap-2">
                     <Input
@@ -444,10 +536,51 @@ function App() {
                       type="button"
                       variant="secondary"
                       disabled={!finnkode}
-                      onClick={() => {
+                      onClick={async () => {
                         if (!finnkode) return
                         const url = `https://pyfinn-git-vercelready-mocialovs-projects.vercel.app/?finnkode=${encodeURIComponent(finnkode)}`
-                        window.open(url, '_blank', 'noopener,noreferrer')
+                        try {
+                          // Try with no-cors mode first
+                          const response = await fetch(url, {
+                            method: 'GET',
+                            mode: 'no-cors'
+                          })
+                          
+                          console.log('Request sent successfully (no-cors mode)')
+                          
+                          // Since no-cors doesn't allow reading response, we'll try a proxy approach
+                          // Alternative: Use a CORS proxy
+                          const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
+                          const corsResponse = await fetch(proxyUrl, {
+                            method: 'GET'
+                          })
+                          
+                          if (corsResponse.ok) {
+                            console.log('CORS proxy request successful:', corsResponse.status)
+                            const proxyData = await corsResponse.json()
+                            console.log('Proxy response:', proxyData)
+                            
+                            // Parse the actual content from the proxy
+                            const data = JSON.parse(proxyData.contents)
+                            console.log('Response data:', data)
+                            
+                            // Extract price from JSON response
+                            if (data && data.ad && data.ad.Prisantydning) {
+                              const price = data.ad.Prisantydning
+                              console.log('Setting house price to:', price)
+                              setHousePrice(price)
+                            } else {
+                              console.error('Price not found in response structure')
+                            }
+                          } else {
+                            console.error('CORS proxy request failed:', corsResponse.status, corsResponse.statusText)
+                          }
+                        } catch (error) {
+                          console.error('Network error:', error)
+                          
+                          // Fallback: Show user instructions to manually enter the price
+                          alert(`CORS error occurred. Please:\n1. Visit the URL directly: ${url}\n2. Copy the Prisantydning value\n3. Paste it into the House Price field`)
+                        }
                       }}
                     >
                       Send
@@ -458,6 +591,16 @@ function App() {
                       URL: https://pyfinn-git-vercelready-mocialovs-projects.vercel.app/?finnkode={encodeURIComponent(finnkode)}
                     </p>
                   )}
+                </div>
+                <div>
+                  <Label htmlFor="housePrice">House Price ({currency})</Label>
+                  <Input
+                    id="housePrice"
+                    type="number"
+                    value={housePrice}
+                    onChange={(e) => setHousePrice(e.target.value === '' ? '' : Number(e.target.value))}
+                    className="mt-1"
+                  />
                 </div>
                 <div>
                   <Label htmlFor="grantedLoan">Granted Loan ({currency})</Label>
