@@ -9,7 +9,9 @@ export default defineConfig({
   // Ensure assets are served correctly on GitHub Pages under /mortgage_calculator/
   base: '/mortgage_calculator/',
   build: {
-    outDir: 'docs',
+    // Use default 'dist' so GitHub Pages workflow artifact path matches
+    outDir: 'dist',
+    emptyOutDir: true,
   },
   resolve: {
     alias: {
