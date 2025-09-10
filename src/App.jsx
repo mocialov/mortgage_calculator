@@ -73,12 +73,13 @@ function App() {
 
   // Mobile stepper (only affects small screens)
   const inputSteps = [
-    'Current Flat Details',
-    'Individual Cash',
-    'New House Details',
-    'Contributions to New Mortgage',
-    'Ownership Split',
-    'Rental Unit'
+    'New House Details',                // Step 1 (index 0)
+    'Current Mortgages',                // Step 2 (index 1)
+    'Individual Cash',                  // Step 3 (index 2)
+    'Ownership Split',                  // Step 4 (index 3)
+    'Rental Unit',                      // Step 5 (index 4)
+    'Contributions to New Mortgage',    // Step 6 (index 5)
+    'Results'                           // Step 7 (index 6)
   ]
 
   const [calculations, setCalculations] = useState({
@@ -420,12 +421,12 @@ function App() {
             <h2 className="text-sm font-semibold text-gray-700 px-1 flex items-center gap-2">
               <Home className="h-4 w-4 text-gray-500" /> New House Details
             </h2>
-            <Card className={`${currentStep === 2 ? 'block' : 'hidden'} lg:block`}>
+            <Card className={`${currentStep === 0 ? 'block' : 'hidden'} lg:block`}>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                {/* <CardTitle className="flex items-center gap-2">
                   <Home className="h-5 w-5" />
                   House Details
-                </CardTitle>
+                </CardTitle> */}
                 <CardDescription>Enter the house price and loan details</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -648,12 +649,12 @@ function App() {
             <h2 className="text-sm font-semibold text-gray-700 px-1 flex items-center gap-2">
               <Banknote className="h-4 w-4 text-gray-500" /> Current Mortgages
             </h2>
-            <Card className={`${currentStep === 0 ? 'block' : 'hidden'} lg:block`}>
+            <Card className={`${currentStep === 1 ? 'block' : 'hidden'} lg:block`}>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                {/* <CardTitle className="flex items-center gap-2">
                   <Banknote className="h-5 w-5" />
                   Current Flat Details
-                </CardTitle>
+                </CardTitle> */}
                 <CardDescription>Current flat sale and individual mortgage shares</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -740,12 +741,12 @@ function App() {
             <h2 className="text-sm font-semibold text-gray-700 px-1 flex items-center gap-2">
               <Users className="h-4 w-4 text-gray-500" /> Individual Cash
             </h2>
-            <Card className={`${currentStep === 1 ? 'block' : 'hidden'} lg:block`}>
+            <Card className={`${currentStep === 2 ? 'block' : 'hidden'} lg:block`}>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                {/* <CardTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5" />
                   Individual Cash
-                </CardTitle>
+                </CardTitle> */}
                 <CardDescription>Enter available cash for each person</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -774,13 +775,18 @@ function App() {
               </CardContent>
             </Card>
 
+            {/* Section: Contributions to New Mortgage */}
+            <div className="border-t border-gray-200 my-4" />
+            <h2 className="text-sm font-semibold text-gray-700 px-1 flex items-center gap-2">
+              <DollarSign className="h-4 w-4 text-gray-500" /> Contributions to New Mortgage
+            </h2>
             {/* Contributions moved into Cash section (step 2) */}
-            <Card className={`${currentStep === 2 ? 'block' : 'hidden'} lg:block`}>
+            <Card className={`${currentStep === 5 ? 'block' : 'hidden'} lg:block`}>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                {/* <CardTitle className="flex items-center gap-2">
                   <DollarSign className="h-5 w-5" />
                   Contributions to New Mortgage
-                </CardTitle>
+                </CardTitle> */}
                 <CardDescription>Editable - how much each person contributes</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -823,14 +829,14 @@ function App() {
               </CardContent>
             </Card>
 
-            <Card className={`${currentStep === 4 ? 'block' : 'hidden'} lg:block`}>
-              {/* Section: Other Factors */}
-              <div className="border-t border-gray-200 my-4" />
-              <h2 className="text-sm font-semibold text-gray-700 px-1 flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-gray-500" /> Other Factors
-              </h2>
+            {/* Section: Ownership Split */}
+            <div className="border-t border-gray-200 my-4" />
+            <h2 className="text-sm font-semibold text-gray-700 px-1 flex items-center gap-2">
+              <Users className="h-4 w-4 text-gray-500" /> Ownership Split
+            </h2>
+            <Card className={`${currentStep === 3 ? 'block' : 'hidden'} lg:block`}>
               <CardHeader>
-                <CardTitle>Ownership Split</CardTitle>
+                {/* <CardTitle>Ownership Split</CardTitle> */}
                 <CardDescription>How will house ownership be split?</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -890,9 +896,14 @@ function App() {
               </CardContent>
             </Card>
 
-            <Card className={`${currentStep === 5 ? 'block' : 'hidden'} lg:block`}>
+            {/* Section: Rental Unit */}
+            <div className="border-t border-gray-200 my-4" />
+            <h2 className="text-sm font-semibold text-gray-700 px-1 flex items-center gap-2">
+              <Home className="h-4 w-4 text-gray-500" /> Rental Unit
+            </h2>
+            <Card className={`${currentStep === 4 ? 'block' : 'hidden'} lg:block`}>
               <CardHeader>
-                <CardTitle>Rental Unit</CardTitle>
+                {/* <CardTitle>Rental Unit</CardTitle> */}
                 <CardDescription>Will the house have a rental unit?</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -922,7 +933,7 @@ function App() {
           </div>
 
           {/* Right Column - Results & Calculations */}
-          <div className="space-y-6">
+          <div className={`${currentStep === 6 ? 'block' : 'hidden'} lg:block space-y-6`}>
             <Card className="border" style={{ background: `linear-gradient(90deg, ${hexToRgba(personAColor, 0.06)}, ${hexToRgba(personAColor, 0.12)})`, borderColor: hexToRgba(personAColor, 0.4) }}>
               <CardHeader>
                 <CardTitle style={{ color: personAColor }}>{aName} Monthly Payment</CardTitle>
@@ -1057,7 +1068,7 @@ function App() {
         </div>
 
         {/* Bottom Section - Spanning Both Columns (Property analysis removed - now inside House Details) */}
-        <div className="border-t border-gray-300 my-8 pt-8">
+  <div className={`${currentStep === 6 ? 'block' : 'hidden'} lg:block border-t border-gray-300 my-8 pt-8`}>
           <div className="space-y-6">
             <Card>
               <CardHeader>
