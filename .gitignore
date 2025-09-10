@@ -8,6 +8,7 @@ node_modules/
 
 # Vite / build output
 dist/
+docs/
 .vite/
 
 # Logs
@@ -29,8 +30,6 @@ pnpm-debug.log*
 # Env files
 .env
 .env.*
-.env.local
-.env.*.local
 
 # Testing / coverage
 coverage/
