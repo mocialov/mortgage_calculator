@@ -379,7 +379,6 @@ function App() {
         
         <div className="border-t border-gray-200 my-6" />
 
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column - Input Sections */}
           <div className="space-y-6">
