@@ -375,101 +375,7 @@ function App() {
           </Card>
         </div>
         
-        {/* Property Status Report */}
-        <div className="mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Property Status Report
-              </CardTitle>
-              <CardDescription>Enter a URL to get property status information</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="propertyUrl">Property URL</Label>
-                <div className="mt-1 flex gap-2">
-                  <Input
-                    id="propertyUrl"
-                    type="text"
-                    value={propertyUrl}
-                    onChange={(e) => setPropertyUrl(e.target.value)}
-                    placeholder="Enter URL parameter (e.g., 'search?q=property')"
-                    className="flex-1"
-                    disabled={isPropertyLoading}
-                  />
-                  <Button
-                    type="button"
-                    variant="default"
-                    disabled={!propertyUrl || isPropertyLoading}
-                    onClick={async () => {
-                      if (!propertyUrl) return
-                      
-                      setIsPropertyLoading(true)
-                      setPropertyResponse('')
-                      
-                      try {
-                        const fullUrl = `https://www.google.com/${propertyUrl}`
-                        
-                        // Use a CORS proxy to fetch the Google URL
-                        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(fullUrl)}`
-                        
-                        const response = await fetch(proxyUrl, {
-                          method: 'GET'
-                        })
-                        
-                        if (response.ok) {
-                          const data = await response.json()
-                          setPropertyResponse(data.contents || 'Response received but content was empty')
-                        } else {
-                          setPropertyResponse(`Error: ${response.status} ${response.statusText}`)
-                        }
-                      } catch (error) {
-                        console.error('Property status request error:', error)
-                        setPropertyResponse(`Network Error: ${error.message}\n\nNote: Due to CORS restrictions, this feature may not work with all URLs. The full URL would be: https://www.google.com/${propertyUrl}`)
-                      } finally {
-                        setIsPropertyLoading(false)
-                      }
-                    }}
-                  >
-                    {isPropertyLoading ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        Loading...
-                      </>
-                    ) : (
-                      'Send'
-                    )}
-                  </Button>
-                </div>
-                {propertyUrl && (
-                  <p className="text-[11px] text-gray-500 mt-1 break-all">
-                    Full URL: https://www.google.com/{propertyUrl}
-                  </p>
-                )}
-              </div>
-              
-              {/* Response Display Area */}
-              {(propertyResponse || isPropertyLoading) && (
-                <div className="mt-4">
-                  <Label>Response</Label>
-                  <div className="mt-1 p-3 bg-gray-50 border rounded-md min-h-[100px] max-h-[400px] overflow-auto">
-                    {isPropertyLoading ? (
-                      <div className="flex items-center justify-center py-8">
-                        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-                        <span className="ml-2 text-gray-500">Fetching property status...</span>
-                      </div>
-                    ) : (
-                      <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono">
-                        {propertyResponse}
-                      </pre>
-                    )}
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+  {/* (Removed separate Property Status Report card - merged into New House Details) */}
         
         <div className="border-t border-gray-200 my-6" />
 
@@ -520,7 +426,8 @@ function App() {
                 </CardTitle>
                 <CardDescription>Enter the house price and loan details</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
+                {/* Finnkode */}
                 <div>
                   <Label htmlFor="finnkode">Finnkode</Label>
                   <div className="mt-1 flex gap-2">
@@ -540,35 +447,15 @@ function App() {
                         if (!finnkode) return
                         const url = `https://pyfinn-git-vercelready-mocialovs-projects.vercel.app/?finnkode=${encodeURIComponent(finnkode)}`
                         try {
-                          // Try with no-cors mode first
-                          const response = await fetch(url, {
-                            method: 'GET',
-                            mode: 'no-cors'
-                          })
-                          
-                          console.log('Request sent successfully (no-cors mode)')
-                          
-                          // Since no-cors doesn't allow reading response, we'll try a proxy approach
-                          // Alternative: Use a CORS proxy
+                          const response = await fetch(url, { method: 'GET', mode: 'no-cors' })
+                          console.log('Request sent (no-cors)')
                           const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
-                          const corsResponse = await fetch(proxyUrl, {
-                            method: 'GET'
-                          })
-                          
+                          const corsResponse = await fetch(proxyUrl, { method: 'GET' })
                           if (corsResponse.ok) {
-                            console.log('CORS proxy request successful:', corsResponse.status)
                             const proxyData = await corsResponse.json()
-                            console.log('Proxy response:', proxyData)
-                            
-                            // Parse the actual content from the proxy
                             const data = JSON.parse(proxyData.contents)
-                            console.log('Response data:', data)
-                            
-                            // Extract price from JSON response
                             if (data && data.ad && data.ad.Prisantydning) {
-                              const price = data.ad.Prisantydning
-                              console.log('Setting house price to:', price)
-                              setHousePrice(price)
+                              setHousePrice(data.ad.Prisantydning)
                             } else {
                               console.error('Price not found in response structure')
                             }
@@ -577,13 +464,11 @@ function App() {
                           }
                         } catch (error) {
                           console.error('Network error:', error)
-                          
-                          // Fallback: Show user instructions to manually enter the price
                           alert(`CORS error occurred. Please:\n1. Visit the URL directly: ${url}\n2. Copy the Prisantydning value\n3. Paste it into the House Price field`)
                         }
                       }}
                     >
-                      Send
+                      Fetch
                     </Button>
                   </div>
                   {finnkode && (
@@ -592,6 +477,74 @@ function App() {
                     </p>
                   )}
                 </div>
+
+                {/* Property Status Report (merged) */}
+                <div>
+                  <Label htmlFor="propertyUrl">Property Status Report URL</Label>
+                  <div className="mt-1 flex gap-2">
+                    <Input
+                      id="propertyUrl"
+                      type="text"
+                      value={propertyUrl}
+                      onChange={(e) => setPropertyUrl(e.target.value)}
+                      placeholder="Paste PDF or page URL with inspection details"
+                      className="flex-1"
+                      disabled={isPropertyLoading}
+                    />
+                    <Button
+                      type="button"
+                      variant="default"
+                      disabled={!propertyUrl || isPropertyLoading}
+                      onClick={async () => {
+                        if (!propertyUrl) return
+                        setIsPropertyLoading(true)
+                        setPropertyResponse('')
+                        try {
+                          const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY
+                          if (!apiKey) {
+                            setPropertyResponse('Missing API key. Define VITE_OPENROUTER_API_KEY in your .env file (never commit real keys).')
+                            return
+                          }
+                          const trimmed = propertyUrl.trim()
+                          const prompt = `Read this property report and summarize all the things that are wrong with this property. Please, using your own reasoning, estimate the individual cost for each problem identified and provide total estimated cost at the end in NOK. The property is located in Norway, Oslo. Here is the document: ${trimmed}`
+                          const payload = { model: 'google/gemma-3n-e2b-it:free', messages: [{ role: 'user', content: prompt }] }
+                          const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                            body: JSON.stringify(payload)
+                          })
+                          if (!response.ok) {
+                            const text = await response.text().catch(() => '')
+                            setPropertyResponse(`Error ${response.status}: ${response.statusText}\n${text}`)
+                            return
+                          }
+                          const data = await response.json()
+                          const aiText = data?.choices?.[0]?.message?.content || 'No content returned.'
+                          setPropertyResponse(aiText)
+                        } catch (error) {
+                          console.error('Property status request error:', error)
+                          setPropertyResponse(`Network Error: ${error.message}`)
+                        } finally {
+                          setIsPropertyLoading(false)
+                        }
+                      }}
+                    >
+                      {isPropertyLoading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          Analyzing...
+                        </>
+                      ) : (
+                        'Analyze'
+                      )}
+                    </Button>
+                  </div>
+                  {propertyUrl && (
+                    <p className="text-[11px] text-gray-500 mt-1 break-all">Document URL: {propertyUrl}</p>
+                  )}
+                </div>
+
+                {/* House Price */}
                 <div>
                   <Label htmlFor="housePrice">House Price ({currency})</Label>
                   <Input
@@ -602,6 +555,8 @@ function App() {
                     className="mt-1"
                   />
                 </div>
+
+                {/* Granted Loan */}
                 <div>
                   <Label htmlFor="grantedLoan">Granted Loan ({currency})</Label>
                   <Input
@@ -612,6 +567,8 @@ function App() {
                     className="mt-1"
                   />
                 </div>
+
+                {/* Interest / Term */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="interestRate">Interest Rate (%)</Label>
@@ -635,6 +592,30 @@ function App() {
                     />
                   </div>
                 </div>
+
+                {/* Analysis Output Inside Card */}
+                {(propertyUrl || propertyResponse || isPropertyLoading) && (
+                  <div className="space-y-2">
+                    <div className="border-t border-gray-200 pt-4" />
+                    <div>
+                      <h3 className="text-sm font-semibold flex items-center gap-2">
+                        <FileText className="h-4 w-4" /> Property Report Analysis
+                      </h3>
+                      <div className="mt-2 p-3 bg-gray-50 border rounded-md min-h-[120px] max-h-[400px] overflow-auto">
+                        {isPropertyLoading ? (
+                          <div className="flex items-center justify-center py-8">
+                            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                            <span className="ml-2 text-gray-500 text-sm">Analyzing property report...</span>
+                          </div>
+                        ) : propertyResponse ? (
+                          <pre className="text-xs text-gray-700 whitespace-pre-wrap font-mono">{propertyResponse}</pre>
+                        ) : (
+                          <p className="text-[11px] text-gray-500">No analysis yet. Provide a URL and press Analyze.</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -1051,7 +1032,7 @@ function App() {
 
         </div>
 
-        {/* Bottom Section - Spanning Both Columns */}
+        {/* Bottom Section - Spanning Both Columns (Property analysis removed - now inside House Details) */}
         <div className="border-t border-gray-300 my-8 pt-8">
           <div className="space-y-6">
             <Card>
