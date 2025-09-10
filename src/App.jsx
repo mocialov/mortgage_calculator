@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { Button } from '@/components/ui/button.jsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
 import { Input } from '@/components/ui/input.jsx'
@@ -478,8 +480,58 @@ function App() {
                   )}
                 </div>
 
-                {/* Property Status Report (merged) */}
+
+                {/* House Price */}
                 <div>
+                  <Label htmlFor="housePrice">House Price ({currency})</Label>
+                  <Input
+                    id="housePrice"
+                    type="number"
+                    value={housePrice}
+                    onChange={(e) => setHousePrice(e.target.value === '' ? '' : Number(e.target.value))}
+                    className="mt-1"
+                  />
+                </div>
+
+                {/* Granted Loan */}
+                <div>
+                  <Label htmlFor="grantedLoan">Granted Loan ({currency})</Label>
+                  <Input
+                    id="grantedLoan"
+                    type="number"
+                    value={grantedLoan}
+                    onChange={(e) => setGrantedLoan(e.target.value === '' ? '' : Number(e.target.value))}
+                    className="mt-1"
+                  />
+                </div>
+
+                {/* Interest / Term */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="interestRate">Interest Rate (%)</Label>
+                    <Input
+                      id="interestRate"
+                      type="number"
+                      step="0.01"
+                      value={interestRate}
+                      onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="loanTerm">Loan Term (Years)</Label>
+                    <Input
+                      id="loanTerm"
+                      type="number"
+                      value={loanTerm}
+                      onChange={(e) => setLoanTerm(e.target.value === '' ? '' : Number(e.target.value))}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+
+                {/* Property Status Report (moved) */}
+                <div className="mt-4">
                   <Label htmlFor="propertyUrl">Property Status Report URL</Label>
                   <div className="mt-1 flex gap-2">
                     <Input
@@ -544,55 +596,6 @@ function App() {
                   )}
                 </div>
 
-                {/* House Price */}
-                <div>
-                  <Label htmlFor="housePrice">House Price ({currency})</Label>
-                  <Input
-                    id="housePrice"
-                    type="number"
-                    value={housePrice}
-                    onChange={(e) => setHousePrice(e.target.value === '' ? '' : Number(e.target.value))}
-                    className="mt-1"
-                  />
-                </div>
-
-                {/* Granted Loan */}
-                <div>
-                  <Label htmlFor="grantedLoan">Granted Loan ({currency})</Label>
-                  <Input
-                    id="grantedLoan"
-                    type="number"
-                    value={grantedLoan}
-                    onChange={(e) => setGrantedLoan(e.target.value === '' ? '' : Number(e.target.value))}
-                    className="mt-1"
-                  />
-                </div>
-
-                {/* Interest / Term */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="interestRate">Interest Rate (%)</Label>
-                    <Input
-                      id="interestRate"
-                      type="number"
-                      step="0.01"
-                      value={interestRate}
-                      onChange={(e) => setInterestRate(e.target.value === '' ? '' : Number(e.target.value))}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="loanTerm">Loan Term (Years)</Label>
-                    <Input
-                      id="loanTerm"
-                      type="number"
-                      value={loanTerm}
-                      onChange={(e) => setLoanTerm(e.target.value === '' ? '' : Number(e.target.value))}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
                 {/* Analysis Output Inside Card */}
                 {(propertyUrl || propertyResponse || isPropertyLoading) && (
                   <div className="space-y-2">
@@ -608,7 +611,28 @@ function App() {
                             <span className="ml-2 text-gray-500 text-sm">Analyzing property report...</span>
                           </div>
                         ) : propertyResponse ? (
-                          <pre className="text-xs text-gray-700 whitespace-pre-wrap font-mono">{propertyResponse}</pre>
+                          <div className="prose prose-sm max-w-none text-gray-800 dark:prose-invert">
+                            <ReactMarkdown
+                              remarkPlugins={[remarkGfm]}
+                              components={{
+                                table: ({node, ...props}) => (
+                                  <div className="overflow-x-auto"><table className="table-auto text-xs" {...props} /></div>
+                                ),
+                                code: ({inline, className, children, ...props}) => {
+                                  const match = /language-(\w+)/.exec(className || '')
+                                  return !inline ? (
+                                    <pre className="bg-gray-900/90 text-gray-100 rounded-md p-2 text-[11px] overflow-auto" {...props}>
+                                      <code>{children}</code>
+                                    </pre>
+                                  ) : (
+                                    <code className="bg-gray-200 rounded px-1 py-0.5 text-[11px]" {...props}>{children}</code>
+                                  )
+                                }
+                              }}
+                            >
+                              {propertyResponse}
+                            </ReactMarkdown>
+                          </div>
                         ) : (
                           <p className="text-[11px] text-gray-500">No analysis yet. Provide a URL and press Analyze.</p>
                         )}
