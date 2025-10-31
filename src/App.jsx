@@ -174,9 +174,9 @@ function App() {
     const personAMaxContribution = personACashNum + personANetProceeds
     const personBMaxContribution = personBCashNum + personBNetProceeds
 
-    // Set default contributions if not manually set
-    const actualPersonAContribution = personAContributionNum || personAMaxContribution
-    const actualPersonBContribution = personBContributionNum || personBMaxContribution
+    // Use the user-set contributions, capped at max available
+    const actualPersonAContribution = Math.min(personAContributionNum, personAMaxContribution)
+    const actualPersonBContribution = Math.min(personBContributionNum, personBMaxContribution)
 
     const totalContribution = actualPersonAContribution + actualPersonBContribution
 
@@ -256,14 +256,6 @@ function App() {
       houseShareValidation,
       totalExistingMortgage
     })
-
-    // Auto-update contribution fields to always match Max available
-    if (personAContributionNum !== personAMaxContribution) {
-      setPersonAContribution(personAMaxContribution)
-    }
-    if (personBContributionNum !== personBMaxContribution) {
-      setPersonBContribution(personBMaxContribution)
-    }
   }, [housePrice, personACash, personBCash, flatSalePrice, personAExistingMortgage, personBExistingMortgage, personAFlatShare, personBFlatShare, personAContribution, personBContribution, personAHouseShare, personBHouseShare, grantedLoan, interestRate, loanTerm, hasRentalUnit, rentalIncome])
 
   const formatCurrency = (amount) => {
@@ -796,7 +788,10 @@ function App() {
                     id="personAContribution"
                     type="number"
                     value={personAContribution}
-                    onChange={(e) => setPersonAContribution(e.target.value === '' ? '' : Number(e.target.value))}
+                    onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : Number(e.target.value)
+                      setPersonAContribution(value)
+                    }}
                     className="mt-1 bg-orange-50 border-orange-200"
                     placeholder={`Max: ${formatCurrency(calculations.personAMaxContribution)}`}
                   />
@@ -804,6 +799,11 @@ function App() {
                     Max available: {formatCurrency(calculations.personAMaxContribution)} 
                     (Cash: {formatCurrency(personACash)} + Net Flat: {formatCurrency(calculations.personANetProceeds)})
                   </p>
+                  {personAContribution > calculations.personAMaxContribution && (
+                    <p className="text-xs text-red-600 mt-1 font-medium">
+                      ⚠️ Exceeds maximum available by {formatCurrency(personAContribution - calculations.personAMaxContribution)}
+                    </p>
+                  )}
                 </div>
                 
                 <div>
@@ -812,7 +812,10 @@ function App() {
                     id="personBContribution"
                     type="number"
                     value={personBContribution}
-                    onChange={(e) => setPersonBContribution(e.target.value === '' ? '' : Number(e.target.value))}
+                    onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : Number(e.target.value)
+                      setPersonBContribution(value)
+                    }}
                     className="mt-1 bg-orange-50 border-orange-200"
                     placeholder={`Max: ${formatCurrency(calculations.personBMaxContribution)}`}
                   />
@@ -820,6 +823,11 @@ function App() {
                     Max available: {formatCurrency(calculations.personBMaxContribution)} 
                     (Cash: {formatCurrency(personBCash)} + Net Flat: {formatCurrency(calculations.personBNetProceeds)})
                   </p>
+                  {personBContribution > calculations.personBMaxContribution && (
+                    <p className="text-xs text-red-600 mt-1 font-medium">
+                      ⚠️ Exceeds maximum available by {formatCurrency(personBContribution - calculations.personBMaxContribution)}
+                    </p>
+                  )}
                 </div>
 
                 <div className="p-3 bg-blue-50 rounded-lg">
