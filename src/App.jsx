@@ -174,9 +174,9 @@ function App() {
     const personAMaxContribution = personACashNum + personANetProceeds
     const personBMaxContribution = personBCashNum + personBNetProceeds
 
-    // Use the user-set contributions, capped at max available
-    const actualPersonAContribution = Math.min(personAContributionNum, personAMaxContribution)
-    const actualPersonBContribution = Math.min(personBContributionNum, personBMaxContribution)
+    // Use the user-set contributions directly (allow exceeding max)
+    const actualPersonAContribution = personAContributionNum
+    const actualPersonBContribution = personBContributionNum
 
     const totalContribution = actualPersonAContribution + actualPersonBContribution
 
