@@ -18,4 +18,6 @@ export default defineConfig({
       "@": fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  // Copy public directory files to dist during build
+  publicDir: 'public',
 })
