@@ -1,0 +1,12 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Disallow admin or private pages (if any in the future)
+# Disallow: /admin/
+
+# Sitemap location
+Sitemap: https://mocialov.github.io/mortgage_calculator/sitemap.xml
+
+# Crawl-delay (optional, helps prevent server overload)
+Crawl-delay: 10
